@@ -1,12 +1,9 @@
 package org.Epixcrafted.EpixServer.mc.item;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.DataInput;
 import java.io.IOException;
 import java.util.zip.DataFormatException;
 import java.util.zip.Inflater;
-import org.Epixcrafted.EpixServer.tools.nbt.NBTTagCompound;
 import org.jboss.netty.buffer.ChannelBuffer;
 
 public class ItemStack {
@@ -14,7 +11,7 @@ public class ItemStack {
 	private int id;
 	private byte count;
 	private short damage;
-	private NBTTagCompound enchantment;
+	private Enchantment enchantment;
 	
 	public ItemStack(int id) {
 		this(id, (byte)1, (short)0);
@@ -24,7 +21,7 @@ public class ItemStack {
 		this(id,  count, damage, null);
 	}
 	
-	public ItemStack(int id, byte count, short damage, NBTTagCompound enchantment) {
+	public ItemStack(int id, byte count, short damage, Enchantment enchantment) {
 		this.setId(id);
 		this.setCount(count);
 		this.setDamage(damage);
@@ -55,11 +52,11 @@ public class ItemStack {
 		this.damage = damage;
 	}
 
-	public NBTTagCompound getEnchantment() {
+	public Enchantment getEnchantment() {
 		return enchantment;
 	}
 
-	public void setEnchantment(NBTTagCompound enchantment) {
+	public void setEnchantment(Enchantment enchantment) {
 		this.enchantment = enchantment;
 	}
 	
@@ -95,12 +92,12 @@ public class ItemStack {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		NBTTagCompound tags = null;
-		try {
+		Enchantment tags = null;
+		/*try {
 			tags = (NBTTagCompound) NBTTagCompound.readNamedTag((DataInput) new ByteArrayInputStream(baos.toByteArray()));
 		} catch (Exception e) {
 			e.printStackTrace();
-		}
+		}*/
 		return new ItemStack(id, itemCount, itemDamage, tags);
 	}
 }

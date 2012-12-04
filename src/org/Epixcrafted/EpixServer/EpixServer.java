@@ -1,5 +1,6 @@
 package org.Epixcrafted.EpixServer;
 
+import java.io.File;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
@@ -8,9 +9,11 @@ import java.util.logging.Logger;
 
 import org.Epixcrafted.EpixServer.chat.commands.AllCommands;
 import org.Epixcrafted.EpixServer.engine.EpixPipelineFactory;
+import org.Epixcrafted.EpixServer.log.ConsoleLogManager;
 import org.Epixcrafted.EpixServer.mc.entity.EntityPlayer;
 import org.Epixcrafted.EpixServer.mc.threads.Time;
 import org.Epixcrafted.EpixServer.mc.threads.TimeSenderThread;
+import org.Epixcrafted.EpixServer.mysql.MySQL;
 
 import org.jboss.netty.bootstrap.ServerBootstrap;
 import org.jboss.netty.channel.ChannelFactory;
@@ -20,13 +23,17 @@ import org.jboss.netty.handler.execution.OrderedMemoryAwareThreadPoolExecutor;
 @SuppressWarnings("unused")
 public class EpixServer extends ServerBootstrap {
 	
-	public static final String MINECRAFT_VERSION = "1.4.2";
-	public static final int PROTOCOL_VERSION = 47;
+	public static final String MINECRAFT_VERSION = "1.4.5";
+	public static final int PROTOCOL_VERSION = 49;
 	private static final Logger log = Logger.getLogger("EpixServer");
 	
-	public String ip = "0.0.0.0";
-	public int port = 25565;
-	public boolean showConsole = true;
+	public static PropertyManager settings;
+	public static MySQL mysql;
+	
+	public String ip;
+	public int port;
+	
+	public static String serverName;
 	
 	private ChannelFactory cfactory;
 	private ExecutorService bossExec;
@@ -41,10 +48,30 @@ public class EpixServer extends ServerBootstrap {
 	private static Time timer;
 	private TimeSenderThread timesender;
 	
-	public EpixServer(String ip, int port, boolean showConsole) {
-		this.ip = ip;
-		this.port = port > 65535 || port < 1024 ? 25565 : port;
-		this.showConsole = showConsole;
+	public EpixServer() {
+		//Настройки
+		settings = new PropertyManager(new File("server.conf"));
+		this.ip = settings.getStringProperty("listen_ip", "0.0.0.0");
+		this.port = settings.getIntProperty("listen_port", 25565);
+		serverName = settings.getStringProperty("server_name", "mcserver");
+		
+		
+		//Подключение к MySQL
+		mysql = new MySQL();
+		String mysql_host = settings.getStringProperty("mysql_host", "127.0.0.1");
+		String mysql_user = settings.getStringProperty("mysql_user", "root");
+		String mysql_pass = settings.getStringProperty("mysql_pass", "");
+		String mysql_db = settings.getStringProperty("mysql_db", "mcserver");
+		try {
+			info("Connection to the MySQL server");
+			mysql.connect(mysql_user, mysql_pass, mysql_host, mysql_db);
+		}catch(Exception e) {
+			error("Cannot connect to MySQL server!");
+			System.exit(0);
+		}
+		
+		//Формат логов
+		ConsoleLogManager.init();
 		
 		this.setFactory(cfactory = new NioServerSocketChannelFactory(bossExec = new OrderedMemoryAwareThreadPoolExecutor(1, 400000000, 2000000000, 60, TimeUnit.SECONDS), ioExec = new OrderedMemoryAwareThreadPoolExecutor(4, 400000000, 2000000000, 60, TimeUnit.SECONDS)));
 		this.setOption("backlog", 500);
@@ -56,12 +83,11 @@ public class EpixServer extends ServerBootstrap {
 		info("EpixServer is starting... (implementing MC " + MINECRAFT_VERSION + " version)");
 		try {
 			this.bind(new InetSocketAddress(ip, port));
+			info("Started listening on " + ip + ":" + port);
 		} catch (Exception e) {
 			error("Error while binding to /" + ip + ":" + port);
 			error("Maybe some application is using this port?");
-			return;
-		} finally {
-			info("Started listening on " + ip + ":" + port);
+			System.exit(0);
 		}
 		
 		(timer = new Time()).start();
@@ -86,8 +112,8 @@ public class EpixServer extends ServerBootstrap {
 		return timer.getTime();
 	}
 	
-	public static void main(String ip, int port, boolean showConsole) {
-		new EpixServer(ip, port, showConsole).init();
+	public static void main() {
+		new EpixServer().init();
 	}
 
 }

@@ -29,7 +29,7 @@ public class PlayerActionLogger {
 		synchronized(EpixServer.players) {
 			for (EntityPlayer pl : EpixServer.players) {
 				Player p = (Player) pl;
-				p.sendMessage(Colour.YELLOW + player.getName() + " joined the game.");
+				p.sendMessage(Colour.YELLOW + player.getName() + " вошел в игру");
 				player.sendPacket(new Packet20NamedEntity(p.getEntityId(), p.getName(), (int)p.getX(), (int)p.getY(), (int)p.getZ(), (byte)0, (byte)0, (short)0, new EntityMetadata()));
 			}
  		}

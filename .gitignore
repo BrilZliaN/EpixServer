@@ -161,3 +161,9 @@ pip-log.txt
 
 # Mac crap
 .DS_Store
+
+server.conf
+server.log
+server.log.lck
+server.log.1
+server.loq.1.lck

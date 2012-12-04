@@ -44,7 +44,13 @@ public class PlayerWorkerThread {
 	public void acceptPacket(Packet packet) {
 		if (packet.getPacketId() == 2) {
 			player = new Player(++EpixServer.allEntitiesUsedIds, ((Packet2Handshake)packet).username, this);
-			channel.write(Packet.write(new Packet1Login(player.getEntityId(), "default", (byte)0x1, (byte)0x0, (byte)0x1, (byte)0x0, (byte)0x0), ChannelBuffers.dynamicBuffer()));
+			if (((Packet2Handshake)packet).protocol < EpixServer.PROTOCOL_VERSION) {
+				channel.write(Packet.write(new Packet255Disconnect("Outdated client!"), ChannelBuffers.dynamicBuffer()));
+			} else if (((Packet2Handshake)packet).protocol > EpixServer.PROTOCOL_VERSION) {
+				channel.write(Packet.write(new Packet255Disconnect("Outdated server!"), ChannelBuffers.dynamicBuffer()));
+			} else {
+				channel.write(Packet.write(new Packet1Login(player.getEntityId(), "default", (byte)0x1, (byte)0x0, (byte)0x1, (byte)0x0, (byte)0x0), ChannelBuffers.dynamicBuffer()));
+			}
 			PlayerActionLogger.playerPreLogin(player);
 			return;
 		}
@@ -127,7 +133,7 @@ public class PlayerWorkerThread {
 			PlayerActionLogger.playerLogin(player);
 		}
 		if (packet.getPacketId() == 254) {
-			String s = "\u00A71\u000047\u00001.4.2\u0000EpixServer\u0000" + EpixServer.players.size() + "\u000065535";
+			String s = "\u00A71\u0000" + EpixServer.PROTOCOL_VERSION + "\u0000" + EpixServer.MINECRAFT_VERSION + "\u0000EpixServer\u0000" + EpixServer.players.size() + "\u000065535";
 			channel.write(Packet.write(new Packet255Disconnect(s), ChannelBuffers.dynamicBuffer()));
 			return;
 		}

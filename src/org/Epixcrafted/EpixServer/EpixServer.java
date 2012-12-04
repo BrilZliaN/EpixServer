@@ -20,13 +20,12 @@ import org.jboss.netty.handler.execution.OrderedMemoryAwareThreadPoolExecutor;
 @SuppressWarnings("unused")
 public class EpixServer extends ServerBootstrap {
 	
-	public static final String MINECRAFT_VERSION = "1.4.2";
-	public static final int PROTOCOL_VERSION = 47;
+	public static final String MINECRAFT_VERSION = "1.4.5";
+	public static final int PROTOCOL_VERSION = 49;
 	private static final Logger log = Logger.getLogger("EpixServer");
 	
 	public String ip = "0.0.0.0";
 	public int port = 25565;
-	public boolean showConsole = true;
 	
 	private ChannelFactory cfactory;
 	private ExecutorService bossExec;
@@ -41,10 +40,9 @@ public class EpixServer extends ServerBootstrap {
 	private static Time timer;
 	private TimeSenderThread timesender;
 	
-	public EpixServer(String ip, int port, boolean showConsole) {
+	public EpixServer(String ip, int port) {
 		this.ip = ip;
 		this.port = port > 65535 || port < 1024 ? 25565 : port;
-		this.showConsole = showConsole;
 		
 		this.setFactory(cfactory = new NioServerSocketChannelFactory(bossExec = new OrderedMemoryAwareThreadPoolExecutor(1, 400000000, 2000000000, 60, TimeUnit.SECONDS), ioExec = new OrderedMemoryAwareThreadPoolExecutor(4, 400000000, 2000000000, 60, TimeUnit.SECONDS)));
 		this.setOption("backlog", 500);
@@ -56,12 +54,11 @@ public class EpixServer extends ServerBootstrap {
 		info("EpixServer is starting... (implementing MC " + MINECRAFT_VERSION + " version)");
 		try {
 			this.bind(new InetSocketAddress(ip, port));
+			info("Started listening on " + ip + ":" + port);
 		} catch (Exception e) {
 			error("Error while binding to /" + ip + ":" + port);
 			error("Maybe some application is using this port?");
-			return;
-		} finally {
-			info("Started listening on " + ip + ":" + port);
+			System.exit(0);
 		}
 		
 		(timer = new Time()).start();
@@ -87,7 +84,7 @@ public class EpixServer extends ServerBootstrap {
 	}
 	
 	public static void main(String ip, int port, boolean showConsole) {
-		new EpixServer(ip, port, showConsole).init();
+		new EpixServer(ip, port).init();
 	}
 
 }

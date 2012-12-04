@@ -4,6 +4,7 @@ import java.net.InetSocketAddress;
 
 import org.Epixcrafted.EpixServer.EpixServer;
 import org.Epixcrafted.EpixServer.mc.entity.Player;
+import org.Epixcrafted.EpixServer.misc.NotSupportedOperationException;
 import org.Epixcrafted.EpixServer.protocol.Packet;
 import org.Epixcrafted.EpixServer.protocol.Packet10Fly;
 import org.Epixcrafted.EpixServer.protocol.Packet11Pos;
@@ -41,7 +42,7 @@ public class PlayerWorkerThread {
 		if (wasAlreadyDisconnected) EpixServer.info(player.getName() + " lost connection. (window closing/channel closing)");
 	}
 
-	public void acceptPacket(Packet packet) {
+	public void acceptPacket(Packet packet) throws NotSupportedOperationException {
 		if (packet.getPacketId() == 2) {
 			player = new Player(++EpixServer.allEntitiesUsedIds, ((Packet2Handshake)packet).username, this);
 			if (((Packet2Handshake)packet).protocol < EpixServer.PROTOCOL_VERSION) {
@@ -167,7 +168,7 @@ public class PlayerWorkerThread {
 		return player;
 	}
 	
-	public void sendPacket(Packet packet) {
+	public void sendPacket(Packet packet) throws NotSupportedOperationException {
 		channel.write(Packet.write(packet, ChannelBuffers.dynamicBuffer()));
 	}
 }

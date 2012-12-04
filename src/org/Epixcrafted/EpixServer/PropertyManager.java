@@ -35,7 +35,7 @@ public class PropertyManager
         }
         else
         {
-            logger.log(Level.WARNING, (new StringBuilder()).append(par1File).append(" does not exist").toString());
+            logger.log(Level.WARNING, (new StringBuilder()).append("File \"").append(par1File).append("\" does not exist").toString());
             generateNewProperties();
         }
     }

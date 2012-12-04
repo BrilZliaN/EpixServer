@@ -7,6 +7,7 @@ import org.Epixcrafted.EpixServer.EpixServer;
 import org.Epixcrafted.EpixServer.chat.Colour;
 import org.Epixcrafted.EpixServer.mc.entity.EntityPlayer;
 import org.Epixcrafted.EpixServer.mc.entity.Player;
+import org.Epixcrafted.EpixServer.misc.NotSupportedOperationException;
 import org.Epixcrafted.EpixServer.protocol.Packet;
 import org.Epixcrafted.EpixServer.protocol.Packet29DestroyEntity;
 import org.jboss.netty.buffer.ChannelBuffers;
@@ -39,7 +40,7 @@ public class PlayerHandler extends SimpleChannelUpstreamHandler {
     }
     
     @Override
-    public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) {
+    public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws NotSupportedOperationException {
         if (e.getChannel().isOpen()) worker.acceptPacket((Packet) e.getMessage());
     }
     
@@ -68,7 +69,9 @@ public class PlayerHandler extends SimpleChannelUpstreamHandler {
         	}
     	} catch (NullPointerException npe) {
     		//handle NPEs
-    	}
+    	} catch (NotSupportedOperationException nsoe) {
+    		//handle operations
+		}
         ctx.getChannel().close();
     }
 }

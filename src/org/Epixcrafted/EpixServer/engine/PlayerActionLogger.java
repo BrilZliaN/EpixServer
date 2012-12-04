@@ -29,7 +29,7 @@ public class PlayerActionLogger {
 		synchronized(EpixServer.players) {
 			for (EntityPlayer pl : EpixServer.players) {
 				Player p = (Player) pl;
-				p.sendMessage(Colour.YELLOW + player.getName() + " вошел в игру");
+				p.sendMessage(Colour.YELLOW + player.getName() + " joined the game.");
 				player.sendPacket(new Packet20NamedEntity(p.getEntityId(), p.getName(), (int)p.getX(), (int)p.getY(), (int)p.getZ(), (byte)0, (byte)0, (short)0, new EntityMetadata()));
 			}
  		}
@@ -64,7 +64,7 @@ public class PlayerActionLogger {
 	 */
 	public static void playerChat(Player player, String message) {
 		EpixServer.info("<" + player.getName() + "> " + message);
-		String formattedMessage = "<" + player.getName() + "> " + (player.getName().equalsIgnoreCase("BrilZliaN") ? Colour.CYAN : "") + message;
+		String formattedMessage = "<" + player.getName() + "> " + message;
 		synchronized(EpixServer.players) {
 			for (EntityPlayer pl : EpixServer.players) {
 				Player p = (Player) pl;

@@ -1,19 +1,13 @@
 package org.Epixcrafted.EpixServer.protocol;
 
-import org.Epixcrafted.EpixServer.mc.item.ItemStack;
 import org.Epixcrafted.EpixServer.misc.NotSupportedOperationException;
 import org.jboss.netty.buffer.ChannelBuffer;
 
-@SuppressWarnings("unused")
-public class Packet5Equip extends Packet {
-	
-	private int entityId;
-	private short slot;
-	private ItemStack item;
+public class Packet33PosLook extends Packet {
 
 	@Override
 	public int getPacketId() {
-		return 0x5;
+		return 0x21;
 	}
 
 	@Override
@@ -22,8 +16,11 @@ public class Packet5Equip extends Packet {
 	}
 
 	@Override
-	public ChannelBuffer send(ChannelBuffer buf) throws NotSupportedOperationException {
-		throw new NotSupportedOperationException(); //not currently supported
+	public ChannelBuffer send(ChannelBuffer buf) {
+		// TODO Auto-generated method stub
+		return buf;
 	}
+	
+	
 
 }

@@ -1,5 +1,6 @@
 package org.Epixcrafted.EpixServer.protocol;
 
+import org.Epixcrafted.EpixServer.misc.NotSupportedOperationException;
 import org.jboss.netty.buffer.ChannelBuffer;
 
 public class Packet19Action extends Packet {
@@ -19,8 +20,8 @@ public class Packet19Action extends Packet {
 	}
 
 	@Override
-	public ChannelBuffer send(ChannelBuffer buf) {
-		throw new RuntimeException();
+	public ChannelBuffer send(ChannelBuffer buf) throws NotSupportedOperationException {
+		throw new NotSupportedOperationException();
 	}
 
 }

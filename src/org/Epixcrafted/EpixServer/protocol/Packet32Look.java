@@ -1,5 +1,6 @@
 package org.Epixcrafted.EpixServer.protocol;
 
+import org.Epixcrafted.EpixServer.misc.NotSupportedOperationException;
 import org.jboss.netty.buffer.ChannelBuffer;
 
 public class Packet32Look extends Packet {
@@ -10,14 +11,14 @@ public class Packet32Look extends Packet {
 	}
 
 	@Override
-	public void get(ChannelBuffer buf) {
-		
+	public void get(ChannelBuffer buf) throws NotSupportedOperationException {
+		throw new NotSupportedOperationException();
 	}
 
 	@Override
 	public ChannelBuffer send(ChannelBuffer buf) {
 		// TODO Auto-generated method stub
-		return null;
+		return buf;
 	}
 
 }

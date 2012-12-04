@@ -1,11 +1,13 @@
 package org.Epixcrafted.EpixServer.protocol;
 
 import java.io.IOException;
+
+import org.Epixcrafted.EpixServer.misc.NotSupportedOperationException;
 import org.jboss.netty.buffer.ChannelBuffer;
 
 public abstract class Packet {
 	
-	public static Packet read(ChannelBuffer buf) throws IOException {
+	public static Packet read(ChannelBuffer buf) throws IOException, NotSupportedOperationException {
 		int id = buf.readByte();
 		if (id < 0) id = 256 + id;
 		Packet packet = getPacket(id);
@@ -14,7 +16,7 @@ public abstract class Packet {
 		return packet;
 	}
 	
-	public static ChannelBuffer write(Packet packet, ChannelBuffer buf) {
+	public static ChannelBuffer write(Packet packet, ChannelBuffer buf) throws NotSupportedOperationException {
 		buf.writeByte((byte)packet.getPacketId());
 		return packet.send(buf);
 	}
@@ -43,7 +45,7 @@ public abstract class Packet {
 	}
 	
 	public abstract int getPacketId();
-	public abstract void get(ChannelBuffer buf);
-	public abstract ChannelBuffer send(ChannelBuffer buf);
+	public abstract void get(ChannelBuffer buf) throws NotSupportedOperationException;
+	public abstract ChannelBuffer send(ChannelBuffer buf) throws NotSupportedOperationException;
 
 }

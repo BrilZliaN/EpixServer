@@ -4,6 +4,7 @@ import java.net.InetSocketAddress;
 
 import org.Epixcrafted.EpixServer.chat.CommandSender;
 import org.Epixcrafted.EpixServer.engine.PlayerWorkerThread;
+import org.Epixcrafted.EpixServer.misc.NotSupportedOperationException;
 import org.Epixcrafted.EpixServer.protocol.Packet;
 import org.Epixcrafted.EpixServer.protocol.Packet3Chat;
 import org.Epixcrafted.EpixServer.protocol.Packet4Time;
@@ -49,15 +50,27 @@ public class Player extends EntityPlayer implements CommandSender {
 	
 	@Override
 	public void sendMessage(String message) {
-		playerWorker.sendPacket(new Packet3Chat(message));
+		try {
+			playerWorker.sendPacket(new Packet3Chat(message));
+		} catch (NotSupportedOperationException e) {
+			//nsoe
+		}
 	}
 	
 	public void synchronizeWorldTime(int time) {
-		playerWorker.sendPacket(new Packet4Time(time));
+		try {
+			playerWorker.sendPacket(new Packet4Time(time));
+		} catch (NotSupportedOperationException e) {
+			//nsoe
+		}
 	}
 	
 	public void sendPacket(Packet packet) {
-		playerWorker.sendPacket(packet);
+		try {
+			playerWorker.sendPacket(packet);
+		} catch (NotSupportedOperationException e) {
+			//nsoe
+		}
 	}
 
 }

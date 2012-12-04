@@ -1,5 +1,6 @@
 package org.Epixcrafted.EpixServer.protocol;
 
+import org.Epixcrafted.EpixServer.misc.NotSupportedOperationException;
 import org.jboss.netty.buffer.ChannelBuffer;
 
 public class Packet2Handshake extends Packet{
@@ -29,7 +30,7 @@ public class Packet2Handshake extends Packet{
 	}
 	
 	@Override
-	public ChannelBuffer send(ChannelBuffer buf) {
-		return null;
+	public ChannelBuffer send(ChannelBuffer buf) throws NotSupportedOperationException {
+		throw new NotSupportedOperationException();
 	}
 }

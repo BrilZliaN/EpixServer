@@ -36,6 +36,8 @@ public abstract class Packet {
 		if (id == 0x11) return new Packet17UseBed();
 		if (id == 0x12) return new Packet18Animation();
 		if (id == 0x13) return new Packet19Action();
+		if (id == 0x64) return new Packet100OpenWindow();
+		if (id == 0x65) return new Packet101CloseWindow();
 		if (id == 0xCA) return new Packet202Abilities();
 		if (id == 0xCC) return new Packet204Settings();
 		if (id == 0xFE) return new Packet254Ping();

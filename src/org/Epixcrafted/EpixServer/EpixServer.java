@@ -56,6 +56,7 @@ public class EpixServer extends ServerBootstrap {
 			String mysql_user = settings.getStringProperty("mysql_user", "root");
 			String mysql_pass = settings.getStringProperty("mysql_pass", "");
 			String mysql_db = settings.getStringProperty("mysql_db", "mcserver");
+			serverName = settings.getStringProperty("server_name", "mcserver");
 			info("Connection to the MySQL server");
 			mysql.connect(mysql_user, mysql_pass, mysql_host, mysql_db);
 		} catch(Exception e) {
@@ -65,7 +66,6 @@ public class EpixServer extends ServerBootstrap {
 		ConsoleLogManager.init();
 		this.ip = settings.getStringProperty("listen_ip", "0.0.0.0");
 		this.port = settings.getIntProperty("listen_port", 25565);
-		serverName = settings.getStringProperty("server_name", "mcserver");
 		
 		this.setFactory(cfactory = new NioServerSocketChannelFactory(bossExec = new OrderedMemoryAwareThreadPoolExecutor(1, 400000000, 2000000000, 60, TimeUnit.SECONDS), ioExec = new OrderedMemoryAwareThreadPoolExecutor(4, 400000000, 2000000000, 60, TimeUnit.SECONDS)));
 		this.setOption("backlog", 500);

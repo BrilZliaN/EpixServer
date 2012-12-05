@@ -2,6 +2,8 @@ package org.Epixcrafted.EpixServer.log;
 
 import java.util.logging.*;
 
+import org.Epixcrafted.EpixServer.mysql.MySQLHandler;
+
 
 public class ConsoleLogManager
 {
@@ -35,7 +37,7 @@ public class ConsoleLogManager
             logger.log(Level.WARNING, "Failed to log to server.log", exception);
         }
         
-        //MySQLHandler jdbcHandler = new MySQLHandler(driver); //TODO: Fix NPE.
-        //logger.addHandler(jdbcHandler);
+        MySQLHandler jdbcHandler = new MySQLHandler(driver);
+        logger.addHandler(jdbcHandler);
     }
 }

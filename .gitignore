@@ -166,4 +166,4 @@ server.conf
 server.log
 server.log.lck
 server.log.1
-server.loq.1.lck
+server.log.1.lck

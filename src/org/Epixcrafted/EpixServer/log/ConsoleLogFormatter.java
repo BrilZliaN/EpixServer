@@ -45,10 +45,6 @@ final class ConsoleLogFormatter extends Formatter
         {
             stringbuilder.append(" [SEVERE] ");
         }
-        else if (level == Level.SEVERE)
-        {
-            stringbuilder.append((new StringBuilder()).append(" [").append(level.getLocalizedName()).append("] ").toString());
-        }
 
         stringbuilder.append(par1LogRecord.getMessage());
         stringbuilder.append('\n');

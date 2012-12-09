@@ -8,106 +8,139 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 import org.Epixcrafted.EpixServer.chat.commands.AllCommands;
+import org.Epixcrafted.EpixServer.chat.commands.CommandList;
 import org.Epixcrafted.EpixServer.engine.EpixPipelineFactory;
+import org.Epixcrafted.EpixServer.engine.Server;
+import org.Epixcrafted.EpixServer.engine.player.Session;
+import org.Epixcrafted.EpixServer.engine.player.SessionList;
 import org.Epixcrafted.EpixServer.log.ConsoleLogManager;
 import org.Epixcrafted.EpixServer.mc.entity.EntityPlayer;
+import org.Epixcrafted.EpixServer.mc.threads.TickCounter;
 import org.Epixcrafted.EpixServer.mc.threads.Time;
-import org.Epixcrafted.EpixServer.mc.threads.TimeSenderThread;
 import org.Epixcrafted.EpixServer.mysql.MySQL;
+import org.Epixcrafted.EpixServer.mysql.MySQLHandler;
 
 import org.jboss.netty.bootstrap.ServerBootstrap;
+import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelFactory;
+import org.jboss.netty.channel.group.ChannelGroup;
+import org.jboss.netty.channel.group.DefaultChannelGroup;
 import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
 import org.jboss.netty.handler.execution.OrderedMemoryAwareThreadPoolExecutor;
 
 @SuppressWarnings("unused")
-public class EpixServer extends ServerBootstrap {
+public class EpixServer implements Server {
 	
-	public static final String MINECRAFT_VERSION = "1.4.5";
-	public static final int PROTOCOL_VERSION = 49;
-	private static final Logger log = Logger.getLogger("EpixServer");
+	private String ip;
+	private int port;
+	private String mysqlIP;
+	private String mysqlUser;
+	private String mysqlPass;
+	private String mysqlDB;
 	
-	public static PropertyManager settings;
-	public static MySQL mysql;
+	private MySQL mysql;
 	
-	public String ip;
-	public int port;
+	private final ServerBootstrap bootstrap = new ServerBootstrap();
+	private final ChannelGroup channelList = new DefaultChannelGroup();
+	private final SessionList sessionList = new SessionList();
+	private final AllCommands commandList = new AllCommands();
+	private final Logger log = Logger.getLogger("EpixServer");
 	
-	public static String serverName;
+	public static int onlinePlayers = 0; //TODO make this private & move
+	public static int maxPlayers = 32767; //TODO make this private & move to an another place
 	
-	private ChannelFactory cfactory;
-	private ExecutorService bossExec;
-	private ExecutorService ioExec;
-	
-	public static EpixServer instance;
-	
-	public static int allEntitiesUsedIds = 0;
-	
-	public static ArrayList<EntityPlayer> players = new ArrayList<EntityPlayer>();
-	public static AllCommands clist;
-	private static Time timer;
-	private TimeSenderThread timesender;
+	public static int lastEntityId = 0; //TODO: move this to an another place!
 	
 	public EpixServer() {
-		settings = new PropertyManager(new File("server.conf"));
+		ConsoleLogManager.init();
+        ExecutorService bossexecutor = new OrderedMemoryAwareThreadPoolExecutor(1, 400000000, 2000000000, 60, TimeUnit.SECONDS);
+        ExecutorService ioexecutor = new OrderedMemoryAwareThreadPoolExecutor(4, 400000000, 2000000000, 60, TimeUnit.SECONDS);
+        bootstrap.setFactory(new NioServerSocketChannelFactory(bossexecutor, ioexecutor));
+        bootstrap.setPipelineFactory(new EpixPipelineFactory(this));
+        bootstrap.setOption("backlog", 500);
+        bootstrap.setOption("connectTimeoutMillis", 10000);
+		readConfiguration();
+	}
+	
+	@Override
+	public void start() {
+		log.info("EpixServer is starting... (implementing MC " + getMinecraftVersion() + " version)");
 		try {
-			mysql = new MySQL();
-			String mysql_host = settings.getStringProperty("mysql_host", "127.0.0.1");
-			String mysql_user = settings.getStringProperty("mysql_user", "root");
-			String mysql_pass = settings.getStringProperty("mysql_pass", "");
-			String mysql_db = settings.getStringProperty("mysql_db", "mcserver");
-			serverName = settings.getStringProperty("server_name", "mcserver");
-			info("Connection to the MySQL server");
-			mysql.connect(mysql_user, mysql_pass, mysql_host, mysql_db);
-		} catch(Exception e) {
-			error("Cannot connect to MySQL server!");
+			bootstrap.bind(new InetSocketAddress(ip, port));
+			log.info("Started listening on " + ip + ":" + port);
+		} catch (Exception e) {
+			log.severe("Error while binding to " + ip + ":" + port);
+			log.severe("Maybe some application is using this port?");
 			System.exit(0);
 		}
-		ConsoleLogManager.init();
+		
+		setupMysqlConnection();
+		ConsoleLogManager.addHandler(new MySQLHandler(ConsoleLogManager.driver));
+		setupMisc();
+	}
+
+	@Override
+	public void shutdown() {
+        bootstrap.getFactory().releaseExternalResources();
+        System.exit(0);
+	}
+
+	@Override
+	public String getMinecraftVersion() {
+		return "1.4.5";
+	}
+	
+	public AllCommands getCommandList() {
+		return commandList;
+	}
+	
+	public void addChannel(Channel channel, Session session) {
+        channelList.add(channel);
+        sessionList.add(session);
+	}
+	
+	public void removeChannel(Channel channel, Session session) {
+        channelList.remove(channel);
+        sessionList.remove(session);
+	}
+	
+	public SessionList getSessionListClass() {
+		return sessionList;
+	}
+	
+	public ArrayList<Session> getSessionList() {
+		return sessionList.getSessionList();
+	}
+	
+	public Logger getLogger() {
+		return log;
+	}
+	
+	public MySQL getMySQL() {
+		return mysql;
+	}
+	
+	private void readConfiguration() {
+		PropertyManager settings = new PropertyManager(new File("server.conf"));
 		this.ip = settings.getStringProperty("listen_ip", "0.0.0.0");
 		this.port = settings.getIntProperty("listen_port", 25565);
-		
-		this.setFactory(cfactory = new NioServerSocketChannelFactory(bossExec = new OrderedMemoryAwareThreadPoolExecutor(1, 400000000, 2000000000, 60, TimeUnit.SECONDS), ioExec = new OrderedMemoryAwareThreadPoolExecutor(4, 400000000, 2000000000, 60, TimeUnit.SECONDS)));
-		this.setOption("backlog", 500);
-		this.setOption("connectTimeoutMillis", 10000);
-		this.setPipelineFactory(new EpixPipelineFactory());
+		this.mysqlIP = settings.getStringProperty("mysql_host", "127.0.0.1");
+		this.mysqlUser = settings.getStringProperty("mysql_user", "root");
+		this.mysqlPass = settings.getStringProperty("mysql_pass", "");
+		this.mysqlDB = settings.getStringProperty("mysql_db", "mc");
 	}
 	
-	public void init() {
-		info("EpixServer is starting... (implementing MC " + MINECRAFT_VERSION + " version)");
+	private void setupMysqlConnection() {
 		try {
-			this.bind(new InetSocketAddress(ip, port));
-			info("Started listening on " + ip + ":" + port);
+			mysql = new MySQL();
+			mysql.connect(mysqlUser, mysqlPass, mysqlIP, mysqlDB);
 		} catch (Exception e) {
-			error("Error while binding to " + ip + ":" + port);
-			error("Maybe some application is using this port?");
+			log.severe("Cannot connect to MySQL server!");
 			System.exit(0);
 		}
-		
-		(timer = new Time()).start();
-		(timesender = new TimeSenderThread()).start();
-		
-		clist = new AllCommands();
 	}
 	
-	public static void info(String s) {
-		log.info(s);
+	private void setupMisc() {
+		new TickCounter().start();
 	}
-
-	public static void warning(String s) {
-		log.warning(s);
-	}
-	
-	public static void error(String s) {
-		log.severe(s);
-	}
-	
-	public static int getTime() {
-		return timer.getTime();
-	}
-	
-	public static void main() {
-		new EpixServer().init();
-	}
-
 }

@@ -1,26 +1,32 @@
 package org.Epixcrafted.EpixServer.protocol;
 
-import java.util.Random;
-
 import org.jboss.netty.buffer.ChannelBuffer;
 
 public class Packet0KeepAlive extends Packet {
 
-	public int keepaliveid = 0;
+	public int keepAliveId = 0;
 	
+	public Packet0KeepAlive() {
+		
+	}
+	
+	public Packet0KeepAlive(int keepAliveId) {
+		this.keepAliveId = keepAliveId;
+	}
+
 	@Override
 	public int getPacketId() {
-		return (int) 0x0;
+		return 0x0;
 	}
 	
 	@Override
 	public void get(ChannelBuffer buf) {
-		keepaliveid = buf.readInt();
+		keepAliveId = buf.readInt();
 	}
 	
 	@Override
 	public ChannelBuffer send(ChannelBuffer buf) {
-		buf.writeInt(keepaliveid = new Random().nextInt(Integer.MAX_VALUE));
+		buf.writeInt(keepAliveId);
 		return buf;
 	}
 }

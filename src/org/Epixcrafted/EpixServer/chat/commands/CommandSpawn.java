@@ -12,7 +12,7 @@ public class CommandSpawn implements Command {
 
 	@Override
 	public boolean executeCommand(CommandSender sender, String[] args) {
-		sender.sendMessage(Colour.RED + "Command /spawn is not currently properly supported.");
+		sender.sendMessage(Colour.RED + "Command /" + getCommandName() + " is not currently properly supported.");
 		return true;
 	}
 

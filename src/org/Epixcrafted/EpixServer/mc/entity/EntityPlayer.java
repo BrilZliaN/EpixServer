@@ -1,10 +1,6 @@
 package org.Epixcrafted.EpixServer.mc.entity;
 
-import org.Epixcrafted.EpixServer.engine.PlayerWorkerThread;
-
 public class EntityPlayer implements Entity {
-	
-	protected PlayerWorkerThread playerWorker;
 	
 	private int entityId;
 	private String name;
@@ -21,48 +17,19 @@ public class EntityPlayer implements Entity {
 	private short food;
 	private float saturation;
 	
-	public EntityPlayer(int entityId, String name, PlayerWorkerThread playerWorker) {
-		this.entityId = entityId;
-		this.name = name;
-		this.playerWorker = playerWorker;
-		
-		this.health = 20;
-		this.food = 20;
-		this.saturation = 5F;
+	public EntityPlayer(int entityId, String name) {
+		this(entityId, name, 0D, 0D, 0D, 0D, 0F, 0F, true, (short)20, (short)20, 5F);
 	}
 	
-	public EntityPlayer(int entityId, String name, double x, double y, double z, PlayerWorkerThread playerWorker) {
-		this.entityId = entityId;
-		this.name = name;
-		this.x = x;
-		this.y = y;
-		this.z = z;
-		this.stance = y + 1.65D; //oh god, kill me please for this!
-		this.playerWorker = playerWorker;
-		
-		this.health = 20;
-		this.food = 20;
-		this.saturation = 5F;
+	public EntityPlayer(int entityId, String name, double x, double y, double z) {
+		this(entityId, name, x, y, z, y + 1.65D, 0F, 0F, true, (short)20, (short)20, 5F);
 	}
 	
-	public EntityPlayer(int entityId, String name, double x, double y, double z, double stance, float yaw, float pitch, boolean onGround, PlayerWorkerThread playerWorker) {
-		this.entityId = entityId;
-		this.name = name;
-		this.x = x;
-		this.y = y;
-		this.z = z;
-		this.stance = stance;
-		this.yaw = yaw;
-		this.pitch = pitch;
-		this.onGround = onGround;
-		this.playerWorker = playerWorker;
-		
-		this.health = 20;
-		this.food = 20;
-		this.saturation = 5F;
+	public EntityPlayer(int entityId, String name, double x, double y, double z, double stance, float yaw, float pitch, boolean onGround) {
+		this(entityId, name, x, y, z, stance, yaw, pitch, onGround, (short)20, (short)20, 5F);
 	}
 	
-	public EntityPlayer(int entityId, String name, double x, double y, double z, double stance, float yaw, float pitch, boolean onGround, short health, short food, float saturation, PlayerWorkerThread playerWorker) {
+	public EntityPlayer(int entityId, String name, double x, double y, double z, double stance, float yaw, float pitch, boolean onGround, short health, short food, float saturation) {
 		this.entityId = entityId;
 		this.name = name;
 		this.x = x;
@@ -75,7 +42,6 @@ public class EntityPlayer implements Entity {
 		this.health = health;
 		this.food = food;
 		this.saturation = saturation;
-		this.playerWorker = playerWorker;
 	}
 	
 	@Override

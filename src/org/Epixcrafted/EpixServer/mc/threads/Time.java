@@ -7,7 +7,7 @@ public class Time extends Thread implements Runnable {
 	
 	public Time() {
 		//currentTime = EpixServer.worlds.get(0);
-		currentTime = 9000;
+		currentTime = 6000;
 	}
 	
 	public synchronized int getTime() {

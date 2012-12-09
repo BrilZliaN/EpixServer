@@ -2,21 +2,19 @@ package org.Epixcrafted.EpixServer.log;
 
 import java.util.logging.*;
 
-import org.Epixcrafted.EpixServer.mysql.MySQLHandler;
-
 
 public class ConsoleLogManager
 {
     /** Reference to the logger. */
     public static Logger logger = Logger.getLogger("EpixServer");
-	static public final String driver = "com.mysql.jdbc.Driver";
+	public static final String driver = "com.mysql.jdbc.Driver";
 	
     public ConsoleLogManager()
     {
     }
 
     /**
-     * Initialises the console logger.
+     * Initializes the console logger.
      */
     public static void init()
     {
@@ -36,8 +34,9 @@ public class ConsoleLogManager
         {
             logger.log(Level.WARNING, "Failed to log to server.log", exception);
         }
-        
-        MySQLHandler jdbcHandler = new MySQLHandler(driver);
-        logger.addHandler(jdbcHandler);
+    }
+    
+    public static void addHandler(Handler handler) {
+        logger.addHandler(handler);
     }
 }

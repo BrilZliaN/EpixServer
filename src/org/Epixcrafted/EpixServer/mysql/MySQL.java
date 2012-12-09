@@ -18,20 +18,19 @@ public class MySQL
 	public MySQL() {
 	}
 	
-	public boolean connect(String Muser, String Mpass, String Mhost, String Mbase) {
-	try
-	{
-		user = Muser;
-		pass = Mpass;
-		host = Mhost;
-		base = Mbase;
+	public boolean connect(String user, String pass, String host, String base) {
+	try {
+		this.user = user;
+		this.pass = pass;
+		this.host = host;
+		this.base = base;
 		
 		String urlConn = "jdbc:mysql://"+host+"/"+base+"?autoReconnect=true"; 
 		Class.forName("com.mysql.jdbc.Driver").newInstance();
 		connection = DriverManager.getConnection(urlConn, user, pass);
 		connected = true;
 		return true;
-	}catch (Exception e) {
+	} catch (Exception e) {
 		System.err.println("Cannot connect to MySQL");
 		e.printStackTrace();
 		connected = false;
@@ -41,52 +40,42 @@ public class MySQL
 	}
 	
 	public boolean disconnect() {
-	try
-	{
-		if(connected) {
-			connection.close();
-			return true;
-		}else{
+		try {
+			if (connected) {
+				connection.close();
+				return true;
+			} else{
+				return false;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			connected = false;
 			return false;
 		}
 	}
 	
-	catch(Exception e)
-	{
-		e.printStackTrace();
-		connected = false;
-		return false;
-	}
-	}
-	
 	public ResultSet query(String q) {
-		try 
-		{
-		rs = null;
-		stmt = null;
-		stmt = connection.createStatement();
-		rs = stmt.executeQuery(q);
-		}
-		catch(Exception e)
-		{
-		e.printStackTrace();
-		connected = false;
+		try {
+			rs = null;
+			stmt = null;
+			stmt = connection.createStatement();
+			rs = stmt.executeQuery(q);
+		} catch (Exception e) {
+			e.printStackTrace();
+			connected = false;
 		}
 		
 		return rs;
 	}
 	
 	public void update(String q) {
-		try 
-		{
-		stmt = null;
-		stmt = connection.createStatement();
-		stmt.executeUpdate(q);
-		}
-		catch(Exception e)
-		{
-		e.printStackTrace();
-		connected = false;
+		try {
+			stmt = null;
+			stmt = connection.createStatement();
+			stmt.executeUpdate(q);
+		} catch (Exception e) {
+			e.printStackTrace();
+			connected = false;
 		}
 	}
 }

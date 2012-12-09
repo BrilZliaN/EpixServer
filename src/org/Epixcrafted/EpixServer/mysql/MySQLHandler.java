@@ -6,8 +6,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-
-import org.Epixcrafted.EpixServer.EpixServer;
+import org.Epixcrafted.EpixServer.Main;
 
 public class MySQLHandler extends Handler {
         String driverName;
@@ -23,7 +22,7 @@ public class MySQLHandler extends Handler {
                 try {
                         this.driverName = driverName;
 						Class.forName(driverName);
-                        connection = EpixServer.mysql.connection;
+                        connection = Main.getServer().getMySQL().connection;
                         ptmtInsert = connection.prepareStatement(insertSQL);
                         ptmtClear = connection.prepareStatement(clearSQL);
                 } catch (ClassNotFoundException e) {
@@ -40,8 +39,7 @@ public class MySQLHandler extends Handler {
 
         @Override
         public void flush() {
-                // TODO Auto-generated method stub
-
+        	
         }
 
         static public String trunc(String str, int length) {
@@ -52,7 +50,6 @@ public class MySQLHandler extends Handler {
 
         @Override
         public void publish(LogRecord record) {
-                // TODO Auto-generated method stub
                 try {
                         // adding entry to log
                         ptmtInsert.setInt(1, record.getLevel().intValue());
@@ -66,7 +63,7 @@ public class MySQLHandler extends Handler {
                         ptmtInsert.setInt(7, record.getThreadID());
                         ptmtInsert.setTimestamp(8,
                                         new Timestamp(System.currentTimeMillis()));
-						ptmtInsert.setString(9, trunc(EpixServer.serverName, 255));
+						ptmtInsert.setString(9, trunc("EpixServer", 255)); //TODO: Server MOTD usage
                         ptmtInsert.executeUpdate();
                 } catch (Exception e) {
                         System.err.println(e.toString());

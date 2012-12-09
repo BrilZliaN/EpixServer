@@ -17,7 +17,15 @@ public class Packet20NamedEntity extends Packet {
 	public EntityMetadata metadata;
 	
 	public Packet20NamedEntity(int entityId, String name, int x, int y, int z, byte yaw, byte pitch, short heldItem, EntityMetadata metadata) { 
-		
+		this.entityId = entityId;
+		this.name = name;
+		this.x = x;
+		this.y = y;
+		this.z = z;
+		this.yaw = yaw;
+		this.pitch = pitch;
+		this.heldItem = heldItem;
+		this.metadata = metadata;
 	}
 
 	@Override

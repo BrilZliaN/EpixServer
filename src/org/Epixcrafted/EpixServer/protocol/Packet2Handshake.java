@@ -7,6 +7,7 @@ public class Packet2Handshake extends Packet{
 
 	public int protocol;
 	public String username;
+	public String password;
 	public String host;
 	public int port;
 	
@@ -22,6 +23,10 @@ public class Packet2Handshake extends Packet{
 		StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < length; i++) sb.append(buf.readChar());
 		username = sb.toString();
+		/*length = buf.readShort();
+		sb = new StringBuilder();
+		for (int i = 0; i < length; i++) sb.append(buf.readChar());
+		password = sb.toString();*/
 		length = buf.readShort();
 		sb = new StringBuilder();
 		for (int i = 0; i < length; i++) sb.append(buf.readChar());

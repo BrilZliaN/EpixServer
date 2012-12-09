@@ -1,6 +1,6 @@
 package org.Epixcrafted.EpixServer.chat;
 
-import org.Epixcrafted.EpixServer.EpixServer;
+import org.Epixcrafted.EpixServer.Main;
 
 public class ConsoleSender implements CommandSender {
 
@@ -11,7 +11,7 @@ public class ConsoleSender implements CommandSender {
 
 	@Override
 	public void sendMessage(String message) {
-		EpixServer.info(message);
+		Main.getServer().getLogger().info(message);
 	}
 
 }

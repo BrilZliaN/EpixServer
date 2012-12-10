@@ -13,7 +13,7 @@
     </target>
 
     <target name="compile" depends="init">
-      <javac srcdir="${srcDir}" destdir="${buildDir}">
+      <javac srcdir="${srcDir}" destdir="${buildDir}" includeantruntime="false">
 	<classpath>
           <pathelement location="mysql-connector-java-5.1.18-bin.jar"/>
           <pathelement location="netty-3.5.11.Final.jar"/>

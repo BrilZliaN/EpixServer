@@ -70,10 +70,10 @@ public class PacketWorker {
 	}
 
 	private void onPacket2Handshake(Packet2Handshake packet) {
-		/*if (packet.protocol != -1) {
+		if (packet.protocol != -1) {
 			session.disconnect("You should use EpixClient to enter this server");
 			return;
-		}*/
+		}
 		session.setPlayer(new Player(session, ++EpixServer.lastEntityId, packet.username));
 		session.send(new Packet1Login(session.getPlayer().getEntityId(), "default", (byte)1, (byte)0, (byte)1, (byte)0, (byte)(EpixServer.maxPlayers > 127 ? 127 : EpixServer.maxPlayers)));
 		PlayerActionLogger.playerPreLogin(session);
@@ -94,7 +94,7 @@ public class PacketWorker {
 	
 	private void onPacket11Pos(Packet11Pos packet) {
 		if (packet.stance < 0D || packet.stance > 1.65D) {
-			//session.disconnect("Invalid stance");
+			session.disconnect("Invalid stance");
 			return;
 		}
 		Player old = session.getPlayer();
@@ -157,7 +157,7 @@ public class PacketWorker {
 	}
 	
 	private void onPacket254Ping(Packet254Ping packet) {
-		String s = "\u00A71\u000049\u0000EpixClient needed\u0000EpixServer\u0000" + EpixServer.onlinePlayers + "\u0000" + EpixServer.maxPlayers;
+		String s = "\u00A71\u0000-1\u0000EpixClient needed\u0000EpixServer\u0000" + EpixServer.onlinePlayers + "\u0000" + EpixServer.maxPlayers;
 		session.disconnect(s);
 	}
 	

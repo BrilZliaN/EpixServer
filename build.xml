@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
-<project default="dist" name="Project Argon">
-     <description>Epix server</description>  
+<project default="dist" name="EpixServer">
+     <description>Epixcrafted Server implementation</description>  
 
     <property name="srcDir" location="src"/>
     <property name="buildDir" location="bin"/>

@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<project default="dist" name="Project Argon">
+     <description>Epix server</description>  
+
+    <property name="srcDir" location="src"/>
+    <property name="buildDir" location="bin"/>
+    <property name="distDir" location="jar"/>
+
+    <target name="init">
+       <tstamp/>
+       <mkdir dir="${buildDir}"/>
+       <mkdir dir="${distDir}"/>
+    </target>
+
+    <target name="compile" depends="init">
+      <javac srcdir="${srcDir}" destdir="${buildDir}">
+	<classpath>
+          <pathelement location="mysql-connector-java-5.1.18-bin.jar"/>
+          <pathelement location="netty-3.5.11.Final.jar"/>
+	</classpath>
+      </javac>
+    </target>
+
+    <target name="dist" depends="compile">
+       <jar destfile="${distDir}/epix-server-${DSTAMP}.jar" basedir="${buildDir}">
+         <manifest>
+           <attribute name="Built-By" value="${user.name}"/>
+           <attribute name="Main-Class" value="package.Main"/>
+         </manifest>
+	 <fileset dir="." includes="*.jar"/>
+       </jar>
+       <jar destfile="${distDir}/epix-server-src-${DSTAMP}.jar" basedir="${srcDir}"/>
+    </target>
+
+    <target name="clean">
+      <delete dir="${buildDir}"/>
+      <delete dir="${distDir}"/>
+    </target>
+</project>
+

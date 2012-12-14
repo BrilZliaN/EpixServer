@@ -78,7 +78,7 @@ public class PlayerHandler extends SimpleChannelUpstreamHandler {
         		}
         	}
     	} catch (NullPointerException npe) {
-    		//handle NPEs
+    		npe.printStackTrace();
     	}
     	ctx.getChannel().close();
     }

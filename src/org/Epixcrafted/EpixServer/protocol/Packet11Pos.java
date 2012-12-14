@@ -21,7 +21,7 @@ public class Packet11Pos extends Packet {
 		x = buf.readDouble();
 		y = buf.readDouble();
 		stance = buf.readDouble();
-		z = buf.readDouble();;
+		z = buf.readDouble();
 		onGround = buf.readByte() == 0x1 ? true : false;
 	}
 

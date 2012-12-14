@@ -27,7 +27,7 @@ public class PlayerActionLogger {
 	public static void playerLogin(Session session) {
 		Main.getServer().getLogger().info(session.getPlayer().getName() + " logged in. EID: " + session.getPlayer().getEntityId() + "; Location: x=" +session.getPlayer().getX() + ", y=" + session.getPlayer().getY() + ", z=" + session.getPlayer().getZ() + ";");
 		for (Session s : Main.getServer().getSessionList()) {
-			s.send(new Packet3Chat(Colour.YELLOW + session.getPlayer().getName() + " joined the game."));
+			//s.send(new Packet3Chat(Colour.YELLOW + session.getPlayer().getName() + " joined the game."));
 			if (s != session) s.send(new Packet20NamedEntity(session.getPlayer().getEntityId(), session.getPlayer().getName(), (int)session.getPlayer().getX(), (int)session.getPlayer().getY(), (int)session.getPlayer().getZ(), (byte)0, (byte)0, (short)0, new EntityMetadata()));
 		}
 	}

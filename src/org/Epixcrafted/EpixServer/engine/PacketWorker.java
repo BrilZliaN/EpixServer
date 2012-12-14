@@ -93,7 +93,7 @@ public class PacketWorker {
 	}
 	
 	private void onPacket11Pos(Packet11Pos packet) {
-		if (packet.stance < 0D || packet.stance > 1.65D) {
+		if (packet.stance - packet.y < 0D || packet.stance - packet.y > 1.65D) {
 			session.disconnect("Invalid stance");
 			return;
 		}
@@ -113,7 +113,7 @@ public class PacketWorker {
 	}
 	
 	private void onPacket13PosLook(Packet13PosLook packet) {
-		if (packet.stance < 0D || packet.stance > 1.65D) {
+		if (packet.stance - packet.y < 0D || packet.stance - packet.y > 1.65D) {
 			session.disconnect("Invalid stance");
 			return;
 		}

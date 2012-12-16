@@ -169,7 +169,6 @@ public class PacketWorker {
 	}
 	
 	private void onPacket255Disconnect(Packet255Disconnect packet) {
-		PlayerActionLogger.playerDisconnect(session);
 		session.disconnect("Disconnected");
 	}
 }

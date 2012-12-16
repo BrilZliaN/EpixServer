@@ -13,6 +13,7 @@ public class AllCommands {
 		addCommand(new CommandVersion());
 		addCommand(new CommandList());
 		addCommand(new CommandSpawn());
+		addCommand(new CommandTPS());
 	}
 	
 	public void addCommand(Command command) {

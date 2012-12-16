@@ -103,15 +103,15 @@ public class Session {
     }
     
     public void disconnect(String reason) {
-        dispose();
         if (channel.isOpen()) {
-        	channel.write(new Packet255Disconnect(reason)).addListener(ChannelFutureListener.CLOSE);
         	if (reason.equalsIgnoreCase(reason)) {
         		PlayerActionLogger.playerDisconnect(this);
         	} else {
         		PlayerActionLogger.playerKick(this);
         	}
+        	channel.write(new Packet255Disconnect(reason)).addListener(ChannelFutureListener.CLOSE);
         }
+        dispose();
         state = Connection.DISCONNECTED;
         channel.close();
     }

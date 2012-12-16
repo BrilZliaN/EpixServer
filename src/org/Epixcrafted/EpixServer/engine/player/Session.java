@@ -7,6 +7,7 @@ import java.util.Queue;
 import java.util.Random;
 
 import org.Epixcrafted.EpixServer.engine.PacketWorker;
+import org.Epixcrafted.EpixServer.engine.PlayerActionLogger;
 import org.Epixcrafted.EpixServer.misc.NotSupportedOperationException;
 import org.Epixcrafted.EpixServer.protocol.Packet;
 import org.Epixcrafted.EpixServer.protocol.Packet0KeepAlive;
@@ -64,23 +65,27 @@ public class Session {
     public void update() {
         timeoutCounter++;
         
-        Packet packet;
-        while ((packet = packetQueue.poll()) != null) {
-            timeoutCounter = 0;
-            worker.acceptPacket(packet);
-        }
+        if (channel.isOpen()) {
+            Packet packet;
+            while ((packet = packetQueue.poll()) != null) {
+                if (packet.getPacketId() != 2 && packet.getPacketId() != 254) {
+                	if (player != null) worker.acceptPacket(packet);
+                } else {
+                    worker.acceptPacket(packet);
+                }
+            }
 
-        if (timeoutCounter >= TIMEOUT_TICKS) {
-            if (keepAliveId == 0) {
+            if (timeoutCounter >= TIMEOUT_TICKS) {
+            	if (state == Connection.CONNECTING) {
+            		disconnect("Took too long to log in");
+            		return;
+            	} else if (state == Connection.CONNECTED){
+                    disconnect("Connection timed out");
+                    return;
+            	}
                 keepAliveId = new Random().nextInt();
                 send(new Packet0KeepAlive(keepAliveId));
                 timeoutCounter = 0;
-            } else {
-            	if (state == Connection.CONNECTING) {
-            		disconnect("Took too long to log in");
-            	} else {
-                    disconnect("Connection timed out");
-            	}
             }
         }
     }
@@ -99,7 +104,14 @@ public class Session {
     
     public void disconnect(String reason) {
         dispose();
-        if (channel.isOpen()) channel.write(new Packet255Disconnect(reason)).addListener(ChannelFutureListener.CLOSE);
+        if (channel.isOpen()) {
+        	channel.write(new Packet255Disconnect(reason)).addListener(ChannelFutureListener.CLOSE);
+        	if (reason.equalsIgnoreCase(reason)) {
+        		PlayerActionLogger.playerDisconnect(this);
+        	} else {
+        		PlayerActionLogger.playerKick(this);
+        	}
+        }
         state = Connection.DISCONNECTED;
         channel.close();
     }

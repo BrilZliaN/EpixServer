@@ -1,4 +1,4 @@
-package org.Epixcrafted.EpixServer.log;
+package org.Epixcrafted.EpixServer.engine.log;
 
 import java.util.logging.*;
 

@@ -1,6 +1,6 @@
 package org.Epixcrafted.EpixServer.chat;
 
-import org.Epixcrafted.EpixServer.Main;
+import org.Epixcrafted.EpixServer.engine.Server;
 
 public class ConsoleSender implements CommandSender {
 
@@ -8,10 +8,15 @@ public class ConsoleSender implements CommandSender {
 	public String getName() {
 		return "CONSOLE";
 	}
+	
+	@Override
+	public Server getServer() {
+		throw new RuntimeException();
+	}
 
 	@Override
 	public void sendMessage(String message) {
-		Main.getServer().getLogger().info(message);
+		throw new RuntimeException();
 	}
 
 }

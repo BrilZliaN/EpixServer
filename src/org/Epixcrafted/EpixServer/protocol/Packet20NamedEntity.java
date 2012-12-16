@@ -1,6 +1,6 @@
 package org.Epixcrafted.EpixServer.protocol;
 
-import org.Epixcrafted.EpixServer.mc.entity.metadata.EntityMetadata;
+import org.Epixcrafted.EpixServer.mc.EntityMetadata;
 import org.Epixcrafted.EpixServer.misc.NotSupportedOperationException;
 import org.jboss.netty.buffer.ChannelBuffer;
 

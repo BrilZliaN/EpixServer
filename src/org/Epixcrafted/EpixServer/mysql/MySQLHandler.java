@@ -6,7 +6,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import org.Epixcrafted.EpixServer.Main;
+
+import org.Epixcrafted.EpixServer.EpixServer;
 
 public class MySQLHandler extends Handler {
         String driverName;
@@ -18,11 +19,11 @@ public class MySQLHandler extends Handler {
         protected PreparedStatement ptmtInsert;
         protected PreparedStatement ptmtClear;
 
-        public MySQLHandler(String driverName) {
+        public MySQLHandler(String driverName, EpixServer server) {
                 try {
                         this.driverName = driverName;
 						Class.forName(driverName);
-                        connection = Main.getServer().getMySQL().connection;
+                        connection = server.getMySQL().connection;
                         ptmtInsert = connection.prepareStatement(insertSQL);
                         ptmtClear = connection.prepareStatement(clearSQL);
                 } catch (ClassNotFoundException e) {

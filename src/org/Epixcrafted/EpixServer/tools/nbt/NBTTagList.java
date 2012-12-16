@@ -1,11 +1,12 @@
 package org.Epixcrafted.EpixServer.tools.nbt;
 
 import java.io.DataInput;
-import java.io.DataOutput;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
+import org.jboss.netty.buffer.ChannelBuffer;
 
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class NBTTagList extends NBTBase
@@ -31,7 +32,7 @@ public class NBTTagList extends NBTBase
     /**
      * Write the actual data contents of the tag, implemented in NBT extension classes
      */
-    void write(DataOutput par1DataOutput) throws IOException
+    ChannelBuffer write(ChannelBuffer par1DataOutput)
     {
         if (!this.tagList.isEmpty())
         {
@@ -49,8 +50,9 @@ public class NBTTagList extends NBTBase
         while (var2.hasNext())
         {
             NBTBase var3 = (NBTBase)var2.next();
-            var3.write(par1DataOutput);
+            par1DataOutput = var3.write(par1DataOutput);
         }
+        return par1DataOutput;
     }
 
     /**

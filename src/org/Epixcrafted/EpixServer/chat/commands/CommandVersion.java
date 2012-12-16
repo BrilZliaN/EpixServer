@@ -9,6 +9,11 @@ public class CommandVersion implements Command {
 	public String getCommandName() {
 		return "version";
 	}
+	
+	@Override
+	public String[] getAliases() {
+		return new String[] {"ver", "v"};
+	}
 
 	@Override
 	public boolean executeCommand(CommandSender sender, String[] args) {

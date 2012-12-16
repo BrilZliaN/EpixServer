@@ -60,25 +60,15 @@ public class PlayerHandler extends SimpleChannelUpstreamHandler {
     	try {
         	Session session = (Session) ctx.getAttachment();
         	if (e.getCause().getMessage().contains("Bad packet")) {
-        		Main.getServer().getLogger().info(session.getPlayer().getName() + " generated an exception: \"" + e.getCause().getMessage() + "\"");
+        		session.getServer().getLogger().info(session.getPlayer().getName() + " generated an exception: \"" + e.getCause().getMessage() + "\"");
         		session.send(new org.Epixcrafted.EpixServer.protocol.Packet255Disconnect(e.getCause().getMessage()));
-        		for (Session s : Main.getServer().getSessionList()) {
-        			if (!s.getPlayer().equals(session.getPlayer())) {
-        				s.send(new Packet29DestroyEntity((byte)1, new int[] { session.getPlayer().getEntityId() }));
-        				s.send(new Packet3Chat(Colour.YELLOW + session.getPlayer().getName() + " was kicked from the game."));
-        			}
-        		}
+				session.disconnect(e.getCause().getMessage());
         	} else {
-        		Main.getServer().getLogger().warning("Caught exception in a stream: \n" + e.getCause());
-        		for (Session s : Main.getServer().getSessionList()) {
-        			if (!s.getPlayer().equals(session.getPlayer())) {
-        				s.send(new Packet29DestroyEntity((byte)1, new int[] { session.getPlayer().getEntityId() }));
-        				s.send(new Packet3Chat(Colour.YELLOW + session.getPlayer().getName() + " was kicked from the game."));
-        			}
-        		}
+        		session.getServer().getLogger().warning("Caught exception in a stream: \n" + e.getCause());
+				session.disconnect("Internal server error");
         	}
     	} catch (NullPointerException npe) {
-    		npe.printStackTrace();
+    		//handle NPEs
     	}
     	ctx.getChannel().close();
     }

@@ -1,8 +1,9 @@
 package org.Epixcrafted.EpixServer.tools.nbt;
 
 import java.io.DataInput;
-import java.io.DataOutput;
 import java.io.IOException;
+
+import org.jboss.netty.buffer.ChannelBuffer;
 
 public class NBTTagDouble extends NBTBase
 {
@@ -23,9 +24,10 @@ public class NBTTagDouble extends NBTBase
     /**
      * Write the actual data contents of the tag, implemented in NBT extension classes
      */
-    void write(DataOutput par1DataOutput) throws IOException
+    ChannelBuffer write(ChannelBuffer par1DataOutput)
     {
         par1DataOutput.writeDouble(this.data);
+        return par1DataOutput;
     }
 
     /**

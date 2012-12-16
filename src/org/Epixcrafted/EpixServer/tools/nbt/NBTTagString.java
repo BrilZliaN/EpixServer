@@ -1,8 +1,9 @@
 package org.Epixcrafted.EpixServer.tools.nbt;
 
 import java.io.DataInput;
-import java.io.DataOutput;
 import java.io.IOException;
+
+import org.jboss.netty.buffer.ChannelBuffer;
 
 public class NBTTagString extends NBTBase
 {
@@ -28,9 +29,13 @@ public class NBTTagString extends NBTBase
     /**
      * Write the actual data contents of the tag, implemented in NBT extension classes
      */
-    void write(DataOutput par1DataOutput) throws IOException
+    ChannelBuffer write(ChannelBuffer par1DataOutput)
     {
-        par1DataOutput.writeUTF(this.data);
+    	par1DataOutput.writeShort(this.data.length());
+        for(int i = 0; i < this.data.length(); ++i) {
+        	par1DataOutput.writeChar(this.data.charAt(i));
+        }
+        return par1DataOutput;
     }
 
     /**
@@ -51,7 +56,7 @@ public class NBTTagString extends NBTBase
 
     public String toString()
     {
-        return "" + this.data;
+        return this.data;
     }
 
     /**

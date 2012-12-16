@@ -9,6 +9,11 @@ public class CommandList implements Command {
 	public String getCommandName() {
 		return "list";
 	}
+	
+	@Override
+	public String[] getAliases() {
+		return new String[] {"l"};
+	}
 
 	@Override
 	public boolean executeCommand(CommandSender sender, String[] args) {

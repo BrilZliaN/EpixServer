@@ -1,8 +1,9 @@
 package org.Epixcrafted.EpixServer.tools.nbt;
 
 import java.io.DataInput;
-import java.io.DataOutput;
 import java.io.IOException;
+
+import org.jboss.netty.buffer.ChannelBuffer;
 
 public class NBTTagEnd extends NBTBase
 {
@@ -19,7 +20,9 @@ public class NBTTagEnd extends NBTBase
     /**
      * Write the actual data contents of the tag, implemented in NBT extension classes
      */
-    void write(DataOutput par1DataOutput) throws IOException {}
+    ChannelBuffer write(ChannelBuffer par1DataOutput) {
+    	return par1DataOutput;
+    }
 
     /**
      * Gets the type byte for the tag.

@@ -9,6 +9,11 @@ public class CommandSpawn implements Command {
 	public String getCommandName() {
 		return "spawn";
 	}
+	
+	@Override
+	public String[] getAliases() {
+		return new String[] {};
+	}
 
 	@Override
 	public boolean executeCommand(CommandSender sender, String[] args) {

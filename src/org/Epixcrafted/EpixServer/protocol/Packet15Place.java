@@ -1,6 +1,6 @@
 package org.Epixcrafted.EpixServer.protocol;
 
-import org.Epixcrafted.EpixServer.mc.item.ItemStack;
+import org.Epixcrafted.EpixServer.mc.ItemStack;
 import org.Epixcrafted.EpixServer.misc.NotSupportedOperationException;
 import org.jboss.netty.buffer.ChannelBuffer;
 

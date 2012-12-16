@@ -1,8 +1,9 @@
 package org.Epixcrafted.EpixServer.tools.nbt;
 
 import java.io.DataInput;
-import java.io.DataOutput;
 import java.io.IOException;
+
+import org.jboss.netty.buffer.ChannelBuffer;
 
 public abstract class NBTBase
 {
@@ -13,8 +14,9 @@ public abstract class NBTBase
 
     /**
      * Write the actual data contents of the tag, implemented in NBT extension classes
+     * @return 
      */
-    abstract void write(DataOutput var1) throws IOException;
+    abstract ChannelBuffer write(ChannelBuffer par1DataOutput);
 
     /**
      * Read the actual data contents of the tag, implemented in NBT extension classes
@@ -95,16 +97,21 @@ public abstract class NBTBase
     /**
      * Writes the specified tag to the given DataOutput, writing the type byte, the UTF string key and then calling the
      * tag to write its data.
+     * @return 
      */
-    public static void writeNamedTag(NBTBase par0NBTBase, DataOutput par1DataOutput) throws IOException
+    public static ChannelBuffer writeNamedTag(NBTBase par0NBTBase, ChannelBuffer par1DataOutput)
     {
         par1DataOutput.writeByte(par0NBTBase.getId());
 
         if (par0NBTBase.getId() != 0)
         {
-            par1DataOutput.writeUTF(par0NBTBase.getName());
-            par0NBTBase.write(par1DataOutput);
+        	par1DataOutput.writeShort(par0NBTBase.getName().length());
+            for(int i = 0; i < par0NBTBase.getName().length(); ++i) {
+            	par1DataOutput.writeChar(par0NBTBase.getName().charAt(i));
+            }
+            par1DataOutput = par0NBTBase.write(par1DataOutput);
         }
+        return par1DataOutput;
     }
 
     /**

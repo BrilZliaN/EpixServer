@@ -31,6 +31,15 @@ public class AllCommands {
 					}
 					return c.executeCommand(sender, args);
 				}
+				for (String alias : c.getAliases()) {
+					if (alias.equalsIgnoreCase(string.split(" ")[0])) {
+						String[] args = new String[string.split(" ").length-1];
+						for (int i = 1; i < args.length; i++) {
+							args[i-1] = string.split(" ")[i];
+						}
+						return c.executeCommand(sender, args);
+					}
+				}
 			}
 		} else { 
 			Iterator<Command> ic = commands.iterator();
@@ -39,8 +48,14 @@ public class AllCommands {
 				if (c.getCommandName().equalsIgnoreCase(string)) {
 					return c.executeCommand(sender, new String[0]);
 				}
+				for (String alias : c.getAliases()) {
+					if (alias.equalsIgnoreCase(string)) {
+						return c.executeCommand(sender, new String[0]);
+					}
+				}
 			}
 		}
+		sender.sendMessage("Unknown command: " + string);
 		return false;
 	}
 

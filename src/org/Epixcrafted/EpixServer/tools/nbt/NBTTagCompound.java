@@ -1,12 +1,13 @@
 package org.Epixcrafted.EpixServer.tools.nbt;
 
 import java.io.DataInput;
-import java.io.DataOutput;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+
+import org.jboss.netty.buffer.ChannelBuffer;
 
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class NBTTagCompound extends NBTBase
@@ -29,7 +30,7 @@ public class NBTTagCompound extends NBTBase
     /**
      * Write the actual data contents of the tag, implemented in NBT extension classes
      */
-    void write(DataOutput par1DataOutput) throws IOException
+    ChannelBuffer write(ChannelBuffer par1DataOutput)
     {
         Iterator var2 = this.tagMap.values().iterator();
 
@@ -40,6 +41,7 @@ public class NBTTagCompound extends NBTBase
         }
 
         par1DataOutput.writeByte(0);
+        return par1DataOutput;
     }
 
     /**

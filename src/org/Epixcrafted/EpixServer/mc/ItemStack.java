@@ -1,9 +1,14 @@
-package org.Epixcrafted.EpixServer.mc.item;
+package org.Epixcrafted.EpixServer.mc;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.DataInput;
 import java.io.IOException;
 import java.util.zip.DataFormatException;
 import java.util.zip.Inflater;
+
+import org.Epixcrafted.EpixServer.tools.nbt.NBTBase;
+import org.Epixcrafted.EpixServer.tools.nbt.NBTTagCompound;
 import org.jboss.netty.buffer.ChannelBuffer;
 
 public class ItemStack {
@@ -11,7 +16,7 @@ public class ItemStack {
 	private int id;
 	private byte count;
 	private short damage;
-	private Enchantment enchantment;
+	private NBTTagCompound enchantment;
 	
 	public ItemStack(int id) {
 		this(id, (byte)1, (short)0);
@@ -21,7 +26,7 @@ public class ItemStack {
 		this(id,  count, damage, null);
 	}
 	
-	public ItemStack(int id, byte count, short damage, Enchantment enchantment) {
+	public ItemStack(int id, byte count, short damage, NBTTagCompound enchantment) {
 		this.setId(id);
 		this.setCount(count);
 		this.setDamage(damage);
@@ -52,14 +57,25 @@ public class ItemStack {
 		this.damage = damage;
 	}
 
-	public Enchantment getEnchantment() {
+	public NBTTagCompound getEnchantment() {
 		return enchantment;
 	}
 
-	public void setEnchantment(Enchantment enchantment) {
+	public void setEnchantment(NBTTagCompound enchantment) {
 		this.enchantment = enchantment;
 	}
 	
+	public ChannelBuffer write(ChannelBuffer buf) {
+		buf.writeShort(this.getId());
+		if (this.getId() != -1) {
+			buf.writeByte(this.getCount());
+			buf.writeShort(this.getDamage());
+			if (this.getEnchantment() != null) {
+				buf = NBTBase.writeNamedTag(this.getEnchantment(), buf);
+			}
+		}
+		return buf;
+	}
 	
 	public static ItemStack readSlot(ChannelBuffer buf) {
 		short id = buf.readShort();
@@ -92,12 +108,12 @@ public class ItemStack {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		Enchantment tags = null;
-		/*try {
+		NBTTagCompound tags = null;
+		try {
 			tags = (NBTTagCompound) NBTTagCompound.readNamedTag((DataInput) new ByteArrayInputStream(baos.toByteArray()));
 		} catch (Exception e) {
 			e.printStackTrace();
-		}*/
+		}
 		return new ItemStack(id, itemCount, itemDamage, tags);
 	}
 }

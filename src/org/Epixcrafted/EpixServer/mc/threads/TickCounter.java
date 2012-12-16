@@ -1,11 +1,16 @@
 package org.Epixcrafted.EpixServer.mc.threads;
 
-import org.Epixcrafted.EpixServer.Main;
+import org.Epixcrafted.EpixServer.EpixServer;
 
 public class TickCounter extends Thread implements Runnable {
 	
-	private static long currentTick = 0;
-	private long sysMillis = 0;
+	private volatile static long currentTick = 0;
+	private volatile long sysMillis = 0;
+	private EpixServer server;
+	
+	public TickCounter(EpixServer server) {
+		this.server = server;
+	}
 	
 	@Override
 	public void run() {
@@ -17,16 +22,13 @@ public class TickCounter extends Thread implements Runnable {
 				update();
 				sysMillis = currTimeMillis;
 			}
-			try {
-				sleep(50);
-			} catch (InterruptedException e) {
-				this.interrupt();
-			}
 		}
 	}
 	
 	public void update() {
-		Main.getServer().getSessionListClass().update();
+		synchronized(server.getSessionListClass()) {
+			server.getSessionListClass().update();
+		}
 	}
 	
 	public synchronized static long getCurrentTick() {

@@ -137,10 +137,10 @@ public class PacketWorker {
 	
 	private void onPacket202Abilities(Packet202Abilities packet) {
 		session.send(packet);
-		session.setConnectionState(Connection.CONNECTED);
 	}
 	
 	private void onPacket204Settings(Packet204Settings packet) {
+		session.setConnectionState(Connection.CONNECTED);
 		//send chunks here
 		session.getPlayer().setX(0D);
 		session.getPlayer().setY(128D);
@@ -157,11 +157,19 @@ public class PacketWorker {
 	}
 	
 	private void onPacket254Ping(Packet254Ping packet) {
-		String s = "\u00A71\u0000-1\u0000EpixClient needed\u0000EpixServer\u0000" + EpixServer.onlinePlayers + "\u0000" + EpixServer.maxPlayers;
-		session.disconnect(s);
+		String s = "";
+		if (packet.magic == 3) {
+			s = "\u00A71\u0000-1\u0000Update needed\u0000EpixServer\u0000" + EpixServer.onlinePlayers + "\u0000" + EpixServer.maxPlayers;
+		} else if (packet.magic == 1) {
+			s = "\u00A71\u0000127\u0000EpixClient needed\u0000EpixServer\u0000" + EpixServer.onlinePlayers + "\u0000" + EpixServer.maxPlayers;
+		} else {
+			s = ""; //TODO: handle 1.3 answering
+		}
+		session.send(new Packet255Disconnect(s));
 	}
 	
 	private void onPacket255Disconnect(Packet255Disconnect packet) {
+		PlayerActionLogger.playerDisconnect(session);
 		session.disconnect("Disconnected");
 	}
 }

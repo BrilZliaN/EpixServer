@@ -13,7 +13,7 @@ import org.Epixcrafted.EpixServer.engine.EpixPipelineFactory;
 import org.Epixcrafted.EpixServer.engine.Server;
 import org.Epixcrafted.EpixServer.engine.player.Session;
 import org.Epixcrafted.EpixServer.engine.player.SessionList;
-import org.Epixcrafted.EpixServer.log.ConsoleLogManager;
+import org.Epixcrafted.EpixServer.engine.log.ConsoleLogManager;
 import org.Epixcrafted.EpixServer.mc.entity.EntityPlayer;
 import org.Epixcrafted.EpixServer.mc.threads.TickCounter;
 import org.Epixcrafted.EpixServer.mc.threads.Time;
@@ -42,7 +42,7 @@ public class EpixServer implements Server {
 	
 	private final ServerBootstrap bootstrap = new ServerBootstrap();
 	private final ChannelGroup channelList = new DefaultChannelGroup();
-	private final SessionList sessionList = new SessionList();
+	private volatile SessionList sessionList = new SessionList();
 	private final AllCommands commandList = new AllCommands();
 	private final Logger log = Logger.getLogger("EpixServer");
 	
@@ -75,7 +75,7 @@ public class EpixServer implements Server {
 		}
 		
 		setupMysqlConnection();
-		ConsoleLogManager.addHandler(new MySQLHandler(ConsoleLogManager.driver));
+		ConsoleLogManager.addHandler(new MySQLHandler(ConsoleLogManager.driver, this));
 		setupMisc();
 	}
 
@@ -104,7 +104,7 @@ public class EpixServer implements Server {
         sessionList.remove(session);
 	}
 	
-	public SessionList getSessionListClass() {
+	public synchronized SessionList getSessionListClass() {
 		return sessionList;
 	}
 	
@@ -141,6 +141,6 @@ public class EpixServer implements Server {
 	}
 	
 	private void setupMisc() {
-		new TickCounter().start();
+		new TickCounter(this).start();
 	}
 }

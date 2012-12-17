@@ -12,6 +12,8 @@ public class TickCounter extends Thread implements Runnable {
 	
 	public TickCounter(EpixServer server) {
 		this.server = server;
+		this.setName("Tick counter thread");
+		this.setDaemon(true);
 	}
 	
 	@Override
@@ -23,15 +25,14 @@ public class TickCounter extends Thread implements Runnable {
 			if (currTimeMillis-sysMillis >= 50) {
 				tps = currentTick / ((currTimeMillis - startMillis)/1000F);
 				currentTick++;
-				update();
+				new UpdateExecutor(server).start();
 				sysMillis = currTimeMillis;
 			}
-		}
-	}
-	
-	public void update() {
-		synchronized(server.getSessionListClass()) {
-			server.getSessionListClass().update();
+			try {
+				sleep(50);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 	

@@ -17,7 +17,7 @@ public class CommandVersion implements Command {
 
 	@Override
 	public boolean executeCommand(CommandSender sender, String[] args) {
-		sender.sendMessage(Colour.PURPLE + "[EpixServer] " + Colour.LIGHT_GREEN + "This server runs on EpixServer DevTest (MC 1.4.2)");
+		sender.sendMessage(Colour.PURPLE + "[EpixServer] " + Colour.LIGHT_GREEN + "This server runs on EpixServer DevTest (MC 1.4.5)");
 		return true;
 	}
 	

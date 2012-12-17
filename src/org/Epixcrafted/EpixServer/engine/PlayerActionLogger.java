@@ -84,10 +84,9 @@ public class PlayerActionLogger {
 	public static void playerDisconnect(Session session) {
 		session.getServer().getLogger().info(session.getPlayer().getName() + " lost connection. (safe quit)");
 		for (Session s : session.getServer().getSessionList()) {
-				if (!s.getPlayer().equals(session.getPlayer())) s.send(new Packet29DestroyEntity((byte)1, new int[] { s.getPlayer().getEntityId() }));
-				if (!s.getPlayer().equals(session.getPlayer())) s.send(new Packet3Chat(Colour.YELLOW + session.getPlayer().getName() + " left the game."));
+				s.send(new Packet29DestroyEntity((byte)1, new int[] { s.getPlayer().getEntityId() }));
+				s.send(new Packet3Chat(Colour.YELLOW + session.getPlayer().getName() + " left the game."));
 		}
-		session.getServer().getSessionListClass().remove(session);
 	}
 	
 	/**

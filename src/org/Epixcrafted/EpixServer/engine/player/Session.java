@@ -103,6 +103,7 @@ public class Session {
     }
     
     public void disconnect(String reason) {
+        getServer().getSessionListClass().remove(this);
         if (channel.isOpen()) {
         	if (reason.equalsIgnoreCase(reason)) {
         		PlayerActionLogger.playerDisconnect(this);

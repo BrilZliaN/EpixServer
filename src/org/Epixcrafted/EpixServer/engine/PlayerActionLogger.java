@@ -61,8 +61,8 @@ public class PlayerActionLogger {
 	 * @param message
 	 */
 	public static void playerChat(Session session, String message) {
-		session.getServer().getLogger().info("<" + session.getPlayer().getName() + "> " + message);
-		String formattedMessage = "<" + session.getPlayer().getName() + "> " + message;
+		session.getServer().getLogger().info(session.getPlayer().getName() + ": " + message);
+		String formattedMessage = session.getPlayer().getName() + ": " + message;
 		for (Session s : session.getServer().getSessionList()) {
 				s.send(new Packet3Chat(formattedMessage));
 		}
@@ -87,6 +87,7 @@ public class PlayerActionLogger {
 				if (!s.getPlayer().equals(session.getPlayer())) s.send(new Packet29DestroyEntity((byte)1, new int[] { s.getPlayer().getEntityId() }));
 				if (!s.getPlayer().equals(session.getPlayer())) s.send(new Packet3Chat(Colour.YELLOW + session.getPlayer().getName() + " left the game."));
 		}
+		session.getServer().getSessionListClass().remove(session);
 	}
 	
 	/**

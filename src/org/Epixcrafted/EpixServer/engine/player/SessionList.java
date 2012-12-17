@@ -22,6 +22,17 @@ public final class SessionList {
         }
     }
     
+    public boolean isExists(Session s, String user) {
+    	for (Session session : sessions.keySet()) {
+    		if(session != s) {
+    			if(session.getPlayer().getName().equalsIgnoreCase(user)) {
+    				return true;
+            	}
+    		}
+        }
+    	return false;
+    }
+    
     public ArrayList<Session> getSessionList() {
     	return new ArrayList<Session>(sessions.keySet());
     }

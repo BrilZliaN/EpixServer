@@ -74,6 +74,11 @@ public class PacketWorker {
 			session.disconnect("You should use EpixClient to enter this server");
 			return;
 		}
+		if(server.getSessionListClass().isExists(session, packet.username)) {
+					session.disconnect("This player is already online!");
+					return;
+		}
+		System.out.println(server.getSessionListClass().isExists(session, packet.username));
 		session.setPlayer(new Player(session, ++EpixServer.lastEntityId, packet.username));
 		session.send(new Packet1Login(session.getPlayer().getEntityId(), "default", (byte)1, (byte)0, (byte)1, (byte)0, (byte)(EpixServer.maxPlayers > 127 ? 127 : EpixServer.maxPlayers)));
 		PlayerActionLogger.playerPreLogin(session);

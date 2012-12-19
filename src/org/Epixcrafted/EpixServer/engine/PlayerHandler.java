@@ -59,16 +59,14 @@ public class PlayerHandler extends SimpleChannelUpstreamHandler {
     public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e) {
     	try {
         	Session session = (Session) ctx.getAttachment();
-        	if (e.getCause().getMessage().contains("Bad packet")) {
-        		session.getServer().getLogger().info(session.getPlayer().getName() + " generated an exception: \"" + e.getCause().getMessage() + "\"");
-        		session.send(new org.Epixcrafted.EpixServer.protocol.Packet255Disconnect(e.getCause().getMessage()));
-				session.disconnect(e.getCause().getMessage());
+        	if (session.getPlayer() != null) {
+        		session.getServer().getLogger().warning("Player " + session.getPlayer().getName() + " generated an exception: " + e.getCause());
         	} else {
-        		session.getServer().getLogger().warning("Caught exception in a stream: \n" + e.getCause());
-				session.disconnect("Internal server error");
+        		session.getServer().getLogger().warning("Caught exception in a stream: " + e.getCause());
         	}
-    	} catch (NullPointerException npe) {
-    		//handle NPEs
+			session.disconnect("Internal server error");
+    	} catch (Exception exc) {
+    		server.getLogger().severe("Caught exception: " + exc.getCause());
     	}
     	ctx.getChannel().close();
     }

@@ -3,7 +3,6 @@ package org.Epixcrafted.EpixServer.engine;
 import org.Epixcrafted.EpixServer.chat.Colour;
 import org.Epixcrafted.EpixServer.engine.player.Player;
 import org.Epixcrafted.EpixServer.engine.player.Session;
-import org.Epixcrafted.EpixServer.mc.EntityMetadata;
 import org.Epixcrafted.EpixServer.protocol.Packet20NamedEntity;
 import org.Epixcrafted.EpixServer.protocol.Packet29DestroyEntity;
 import org.Epixcrafted.EpixServer.protocol.Packet31Move;
@@ -20,14 +19,17 @@ public class PlayerActionLogger {
 	}
 	
 	/**
-	 * Should be fired after receiving Packet204Settings and after sending map chunks
+	 * Should be fired after receiving Packet205Status and after sending map chunks
 	 * @param session
 	 */
 	public static void playerLogin(Session session) {
 		session.getServer().getLogger().info(session.getPlayer().getName() + " logged in. EID: " + session.getPlayer().getEntityId() + "; Location: x=" +session.getPlayer().getX() + ", y=" + session.getPlayer().getY() + ", z=" + session.getPlayer().getZ() + ";");
 		for (Session s : session.getServer().getSessionList()) {
 			s.send(new Packet3Chat(Colour.YELLOW + session.getPlayer().getName() + " joined the game."));
-			if (s != session) s.send(new Packet20NamedEntity(session.getPlayer().getEntityId(), session.getPlayer().getName(), (int)session.getPlayer().getX(), (int)session.getPlayer().getY(), (int)session.getPlayer().getZ(), (byte)0, (byte)0, (short)0, new EntityMetadata()));
+			if (s != session) {
+				session.send(new Packet20NamedEntity(s.getPlayer()));
+				s.send(new Packet20NamedEntity(session.getPlayer()));
+			}
 		}
 	}
 	
@@ -37,9 +39,9 @@ public class PlayerActionLogger {
 	 */
 	public static void playerMove(Session session, Player old, boolean isPacket11, boolean isAll) {
 		if (isAll) {
-			byte x = (byte) (-((int)old.getX() - (int)session.getPlayer().getX()) * 32);
-			byte y = (byte) (-((int)old.getY() - (int)session.getPlayer().getY()) * 32);
-			byte z = (byte) (-((int)old.getZ() - (int)session.getPlayer().getZ()) * 32);
+			byte x = (byte) (((int)-(old.getX() - session.getPlayer().getX())) * 32);
+			byte y = (byte) (((int)-(old.getX() - session.getPlayer().getX())) * 32);
+			byte z = (byte) (((int)-(old.getX() - session.getPlayer().getX())) * 32);
 			for (Session s : session.getServer().getSessionList()) {
 				if (s != session) s.send(new Packet31Move(session.getPlayer().getEntityId(), x, y, z));
 			}

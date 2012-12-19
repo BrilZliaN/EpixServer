@@ -13,14 +13,14 @@ public class Packet1Login extends Packet {
 	public byte worldHeight;
 	public byte maxPlayers;
 	
-	public Packet1Login(int entityId, String levelType, byte gameMode, byte dimension, byte difficulty, byte worldHeight, byte maxPlayers) {
+	public Packet1Login(int entityId, String levelType, byte gameMode, byte dimension, byte difficulty, byte worldHeight, int maxPlayers) {
 		this.entityId = entityId;
 		this.levelType = levelType;
 		this.gameMode = gameMode;
 		this.dimension = dimension;
 		this.difficulty = difficulty;
 		this.worldHeight = worldHeight;
-		this.maxPlayers = maxPlayers;
+		this.maxPlayers = (byte) (maxPlayers > 127 ? 127 : maxPlayers);
 	}
 
 	@Override

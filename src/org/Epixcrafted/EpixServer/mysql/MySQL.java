@@ -18,8 +18,7 @@ public class MySQL
 	public MySQL() {
 	}
 	
-	public boolean connect(String user, String pass, String host, String base) {
-	try {
+	public void connect(String user, String pass, String host, String base) throws InstantiationException, IllegalAccessException, ClassNotFoundException, SQLException {
 		this.user = user;
 		this.pass = pass;
 		this.host = host;
@@ -29,14 +28,6 @@ public class MySQL
 		Class.forName("com.mysql.jdbc.Driver").newInstance();
 		connection = DriverManager.getConnection(urlConn, user, pass);
 		connected = true;
-		return true;
-	} catch (Exception e) {
-		System.err.println("Cannot connect to MySQL");
-		e.printStackTrace();
-		connected = false;
-		return false;
-	}
-	
 	}
 	
 	public boolean disconnect() {

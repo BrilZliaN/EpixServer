@@ -1,6 +1,5 @@
 package org.Epixcrafted.EpixServer.chat.commands;
 
-import org.Epixcrafted.EpixServer.EpixServer;
 import org.Epixcrafted.EpixServer.chat.CommandSender;
 
 public class CommandList implements Command {
@@ -17,7 +16,7 @@ public class CommandList implements Command {
 
 	@Override
 	public boolean executeCommand(CommandSender sender, String[] args) {
-		sender.sendMessage("There are " + EpixServer.onlinePlayers + "/" + EpixServer.maxPlayers + " players online:"); //TODO use non-static field
+		sender.sendMessage("There are " + sender.getServer().getOnlinePlayers() + "/" + sender.getServer().getMaximumPlayers() + " players online:");
 		return true;
 	}
 

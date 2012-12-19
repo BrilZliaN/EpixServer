@@ -39,7 +39,9 @@ public abstract class Packet {
 		if (id == 0x64) return new Packet100OpenWindow();
 		if (id == 0x65) return new Packet101CloseWindow();
 		if (id == 0xCA) return new Packet202Abilities();
+		if (id == 0xCB) return new Packet203TabComplete();
 		if (id == 0xCC) return new Packet204Settings();
+		if (id == 0xCD) return new Packet205Status();
 		if (id == 0xFE) return new Packet254Ping();
 		if (id == 0xFF) return new Packet255Disconnect();
 		

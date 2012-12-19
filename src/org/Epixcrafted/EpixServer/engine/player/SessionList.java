@@ -25,9 +25,11 @@ public final class SessionList {
     public boolean isExists(Session s, String user) {
     	for (Session session : sessions.keySet()) {
     		if(session != s) {
-    			if(session.getPlayer().getName().equalsIgnoreCase(user)) {
-    				return true;
-            	}
+    			if (session.getPlayer() != null) { 
+        			if(session.getPlayer().getName().equalsIgnoreCase(user)) {
+        				return true;
+                	}
+    			}
     		}
         }
     	return false;

@@ -7,5 +7,9 @@ public interface Server {
 	public void shutdown();
 	
 	public String getMinecraftVersion();
+	
+	public int getOnlinePlayers();
+	
+	public int getMaximumPlayers();
 
 }

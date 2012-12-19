@@ -123,9 +123,9 @@ public class Session {
     
     public InetSocketAddress getAddress() {
         SocketAddress addr = channel.getRemoteAddress();
-        if (addr instanceof InetSocketAddress) {
+        try {
             return (InetSocketAddress) addr;
-        } else {
+        } catch (Exception e) {
             return null;
         }
     }

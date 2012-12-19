@@ -12,7 +12,9 @@ import org.Epixcrafted.EpixServer.protocol.Packet13PosLook;
 import org.Epixcrafted.EpixServer.protocol.Packet18Animation;
 import org.Epixcrafted.EpixServer.protocol.Packet1Login;
 import org.Epixcrafted.EpixServer.protocol.Packet202Abilities;
+import org.Epixcrafted.EpixServer.protocol.Packet203TabComplete;
 import org.Epixcrafted.EpixServer.protocol.Packet204Settings;
+import org.Epixcrafted.EpixServer.protocol.Packet205Status;
 import org.Epixcrafted.EpixServer.protocol.Packet254Ping;
 import org.Epixcrafted.EpixServer.protocol.Packet255Disconnect;
 import org.Epixcrafted.EpixServer.protocol.Packet2Handshake;
@@ -58,9 +60,15 @@ public class PacketWorker {
 		if (packet.getPacketId() == 202) {
 			onPacket202Abilities((Packet202Abilities) packet);
 		} else
+		if (packet.getPacketId() == 203) {
+			onPacket203TabComplete((Packet203TabComplete) packet);
+		} else
 		if (packet.getPacketId() == 204) {
 			onPacket204Settings((Packet204Settings) packet);
 		} else
+		if (packet.getPacketId() == 205) {
+			onPacket205Status((Packet205Status) packet);
+		}
 		if (packet.getPacketId() == 254) {
 			onPacket254Ping((Packet254Ping) packet);
 		} else
@@ -74,12 +82,12 @@ public class PacketWorker {
 			session.disconnect("You should use EpixClient to enter this server");
 			return;
 		}
-		if(server.getSessionListClass().isExists(session, packet.username)) {
-					session.disconnect("This player is already online!");
-					return;
-		}
 		session.setPlayer(new Player(session, ++EpixServer.lastEntityId, packet.username));
-		session.send(new Packet1Login(session.getPlayer().getEntityId(), "default", (byte)1, (byte)0, (byte)1, (byte)0, (byte)(EpixServer.maxPlayers > 127 ? 127 : EpixServer.maxPlayers)));
+		if (server.getSessionListClass().isExists(session, packet.username)) {
+			session.disconnect("This player is already online!");
+			return;
+		}
+		session.send(new Packet1Login(session.getPlayer().getEntityId(), "default", (byte)1, (byte)0, (byte)1, (byte)0, (this.server.getMaximumPlayers())));
 		PlayerActionLogger.playerPreLogin(session);
 	}
 	
@@ -143,6 +151,11 @@ public class PacketWorker {
 		session.send(packet);
 	}
 	
+	private void onPacket203TabComplete(Packet203TabComplete packet) {
+		packet.server = packet.client;
+		session.send(packet);
+	}
+	
 	private void onPacket204Settings(Packet204Settings packet) {
 		session.setConnectionState(Connection.CONNECTED);
 		//send chunks here
@@ -160,16 +173,20 @@ public class PacketWorker {
 		PlayerActionLogger.playerLogin(session);
 	}
 	
+	private void onPacket205Status(Packet205Status packet) {
+		
+	}
+	
 	private void onPacket254Ping(Packet254Ping packet) {
-		String s = "";
+		String answer = "";
 		if (packet.magic == 3) {
-			s = "\u00A71\u0000-1\u0000Update needed\u0000EpixServer\u0000" + EpixServer.onlinePlayers + "\u0000" + EpixServer.maxPlayers;
+			answer = "\u00A71\u0000-1\u0000Update needed\u0000EpixServer\u0000" + this.server.getOnlinePlayers() + "\u0000" + this.server.getMaximumPlayers();
 		} else if (packet.magic == 1) {
-			s = "\u00A71\u0000127\u0000EpixClient needed\u0000EpixServer\u0000" + EpixServer.onlinePlayers + "\u0000" + EpixServer.maxPlayers;
+			answer = "\u00A71\u0000127\u0000EpixClient needed\u0000EpixServer\u0000" + this.server.getOnlinePlayers() + "\u0000" + this.server.getMaximumPlayers();
 		} else {
-			s = ""; //TODO: handle 1.3 answering
+			answer = ""; //TODO: handle 1.3 answering
 		}
-		session.send(new Packet255Disconnect(s));
+		session.send(new Packet255Disconnect(answer));
 	}
 	
 	private void onPacket255Disconnect(Packet255Disconnect packet) {

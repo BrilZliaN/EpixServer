@@ -1,5 +1,6 @@
 package org.Epixcrafted.EpixServer.protocol;
 
+import org.Epixcrafted.EpixServer.engine.player.Player;
 import org.Epixcrafted.EpixServer.mc.EntityMetadata;
 import org.Epixcrafted.EpixServer.misc.NotSupportedOperationException;
 import org.jboss.netty.buffer.ChannelBuffer;
@@ -16,16 +17,16 @@ public class Packet20NamedEntity extends Packet {
 	public short heldItem;
 	public EntityMetadata metadata;
 	
-	public Packet20NamedEntity(int entityId, String name, int x, int y, int z, byte yaw, byte pitch, short heldItem, EntityMetadata metadata) { 
-		this.entityId = entityId;
-		this.name = name;
-		this.x = x;
-		this.y = y;
-		this.z = z;
-		this.yaw = yaw;
-		this.pitch = pitch;
-		this.heldItem = heldItem;
-		this.metadata = metadata;
+	public Packet20NamedEntity(Player player) {
+		this.entityId = player.getEntityId();
+		this.name = player.getName();
+		this.x = (int) (player.getX() * 32D);
+		this.y = (int) (player.getY() * 32D);
+		this.z = (int) (player.getZ() * 32D);
+		this.yaw = (byte)((int) (player.getYaw() * 256.0F / 360.0F));
+		this.pitch = (byte)((int) (player.getPitch() * 256.0F / 360.0F));
+		this.heldItem = 0;
+		this.metadata = new EntityMetadata();
 	}
 
 	@Override

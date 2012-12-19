@@ -46,8 +46,7 @@ public class EpixServer implements Server {
 	private final AllCommands commandList = new AllCommands();
 	private final Logger log = Logger.getLogger("EpixServer");
 	
-	public static int onlinePlayers = 0; //TODO make this private & move
-	public static int maxPlayers = 32767; //TODO make this private & move to an another place
+	private int maxPlayers = 32767; //TODO make a config string
 	
 	public static int lastEntityId = 0; //TODO: move this to an another place!
 	
@@ -75,7 +74,6 @@ public class EpixServer implements Server {
 		}
 		
 		setupMysqlConnection();
-		ConsoleLogManager.addHandler(new MySQLHandler(ConsoleLogManager.driver, this));
 		setupMisc();
 	}
 
@@ -120,6 +118,23 @@ public class EpixServer implements Server {
 		return mysql;
 	}
 	
+	@Override
+	public int getOnlinePlayers() {
+		int online = 0;
+		for (Session s : getSessionList()) {
+			if (online > maxPlayers) continue;
+			if (s.getPlayer() != null) {
+				online++;
+			}
+		}
+		return online;
+	}
+	
+	@Override
+	public int getMaximumPlayers() {
+		return maxPlayers;
+	}
+	
 	private void readConfiguration() {
 		PropertyManager settings = new PropertyManager(new File("server.conf"));
 		this.ip = settings.getStringProperty("listen_ip", "0.0.0.0");
@@ -134,9 +149,10 @@ public class EpixServer implements Server {
 		try {
 			mysql = new MySQL();
 			mysql.connect(mysqlUser, mysqlPass, mysqlIP, mysqlDB);
+			ConsoleLogManager.addHandler(new MySQLHandler(ConsoleLogManager.driver, this));
 		} catch (Exception e) {
 			log.severe("Cannot connect to MySQL server!");
-			System.exit(0);
+			setupMysqlConnection(); //retry
 		}
 	}
 	

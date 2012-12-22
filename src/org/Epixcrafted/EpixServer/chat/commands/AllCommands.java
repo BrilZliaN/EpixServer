@@ -14,6 +14,8 @@ public class AllCommands {
 		addCommand(new CommandList());
 		addCommand(new CommandSpawn());
 		addCommand(new CommandTPS());
+		addCommand(new CommandStop());
+		addCommand(new CommandSay());
 	}
 	
 	public void addCommand(Command command) {

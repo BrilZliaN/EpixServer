@@ -1,4 +1,4 @@
-package org.Epixcrafted.EpixServer.mc.threads;
+package org.Epixcrafted.EpixServer.threads;
 
 import org.Epixcrafted.EpixServer.EpixServer;
 

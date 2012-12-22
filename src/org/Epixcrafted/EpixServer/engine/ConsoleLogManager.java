@@ -1,6 +1,7 @@
-package org.Epixcrafted.EpixServer.engine.log;
+package org.Epixcrafted.EpixServer.engine;
 
 import java.util.logging.*;
+
 
 
 public class ConsoleLogManager

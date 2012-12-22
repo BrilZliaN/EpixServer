@@ -1,4 +1,4 @@
-package org.Epixcrafted.EpixServer.mc.threads;
+package org.Epixcrafted.EpixServer.threads;
 
 import org.Epixcrafted.EpixServer.EpixServer;
 
@@ -8,6 +8,7 @@ public class TickCounter extends Thread implements Runnable {
 	private volatile static long startMillis = 0;
 	private volatile static long sysMillis = 0;
 	private volatile static float tps = 0;
+	private volatile static float totalTps = 0;
 	private EpixServer server;
 	
 	public TickCounter(EpixServer server) {
@@ -23,7 +24,8 @@ public class TickCounter extends Thread implements Runnable {
 			if (startMillis == 0) startMillis = sysMillis;
 			long currTimeMillis = System.currentTimeMillis();
 			if (currTimeMillis-sysMillis >= 50) {
-				tps = currentTick / ((currTimeMillis - startMillis)/1000F);
+				totalTps = currentTick / ((currTimeMillis - startMillis)/1000F);
+				tps = tps * 0.95F + (1000 / (currTimeMillis-sysMillis)) * 0.05F;
 				currentTick++;
 				new UpdateExecutor(server).start();
 				sysMillis = currTimeMillis;
@@ -41,7 +43,11 @@ public class TickCounter extends Thread implements Runnable {
 	}
 	
 	public synchronized static float getTicksPerSecond() {
-		return ((int)(tps*100)/100F);
+		return ((int)(tps*10)/10F);
+	}
+	
+	public synchronized static float getTotalTicksPerSecond() {
+		return ((int)(totalTps*10)/10F);
 	}
 
 	public synchronized static long getUptime() {

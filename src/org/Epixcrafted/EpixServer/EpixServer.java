@@ -7,18 +7,20 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
+import org.Epixcrafted.EpixServer.chat.CommandSender;
+import org.Epixcrafted.EpixServer.chat.ConsoleSender;
 import org.Epixcrafted.EpixServer.chat.commands.AllCommands;
 import org.Epixcrafted.EpixServer.chat.commands.CommandList;
+import org.Epixcrafted.EpixServer.engine.ConsoleLogManager;
 import org.Epixcrafted.EpixServer.engine.EpixPipelineFactory;
 import org.Epixcrafted.EpixServer.engine.Server;
 import org.Epixcrafted.EpixServer.engine.player.Session;
 import org.Epixcrafted.EpixServer.engine.player.SessionList;
-import org.Epixcrafted.EpixServer.engine.log.ConsoleLogManager;
 import org.Epixcrafted.EpixServer.mc.entity.EntityPlayer;
-import org.Epixcrafted.EpixServer.mc.threads.TickCounter;
-import org.Epixcrafted.EpixServer.mc.threads.Time;
 import org.Epixcrafted.EpixServer.mysql.MySQL;
 import org.Epixcrafted.EpixServer.mysql.MySQLHandler;
+import org.Epixcrafted.EpixServer.threads.ConsoleReaderThread;
+import org.Epixcrafted.EpixServer.threads.TickCounter;
 
 import org.jboss.netty.bootstrap.ServerBootstrap;
 import org.jboss.netty.channel.Channel;
@@ -44,9 +46,10 @@ public class EpixServer implements Server {
 	private final ChannelGroup channelList = new DefaultChannelGroup();
 	private volatile SessionList sessionList = new SessionList();
 	private final AllCommands commandList = new AllCommands();
+	private final CommandSender console = new ConsoleSender(this);
 	private final Logger log = Logger.getLogger("EpixServer");
 	
-	private int maxPlayers = 32767; //TODO make a config string
+	private int maxPlayers;
 	
 	public static int lastEntityId = 0; //TODO: move this to an another place!
 	
@@ -72,14 +75,18 @@ public class EpixServer implements Server {
 			log.severe("Maybe some application is using this port?");
 			System.exit(0);
 		}
-		
+		setupConsole();
 		setupMysqlConnection();
 		setupMisc();
 	}
 
 	@Override
 	public void shutdown() {
-        bootstrap.getFactory().releaseExternalResources();
+		for (Session session : getSessionList()) {
+			session.disconnect("Server is stopping...");
+		}
+		bootstrap.getFactory().releaseExternalResources();
+		System.out.println("Server stopped..");
         System.exit(0);
 	}
 
@@ -119,7 +126,7 @@ public class EpixServer implements Server {
 	}
 	
 	@Override
-	public int getOnlinePlayers() {
+	public int getOnlinePlayerCount() {
 		int online = 0;
 		for (Session s : getSessionList()) {
 			if (online > maxPlayers) continue;
@@ -135,24 +142,40 @@ public class EpixServer implements Server {
 		return maxPlayers;
 	}
 	
+	@Override
+	public String[] getOnlinePlayers() {
+		String[] players = new String[getOnlinePlayerCount()];
+		for (int i = 0; i < getOnlinePlayerCount(); i++) {
+			players[i] = getSessionList().get(i).getPlayer().getName();;
+		}
+		return players;
+	}
+	
 	private void readConfiguration() {
 		PropertyManager settings = new PropertyManager(new File("server.conf"));
 		this.ip = settings.getStringProperty("listen_ip", "0.0.0.0");
 		this.port = settings.getIntProperty("listen_port", 25565);
+		this.maxPlayers = settings.getIntProperty("max_players", 32767);
 		this.mysqlIP = settings.getStringProperty("mysql_host", "127.0.0.1");
 		this.mysqlUser = settings.getStringProperty("mysql_user", "root");
 		this.mysqlPass = settings.getStringProperty("mysql_pass", "");
 		this.mysqlDB = settings.getStringProperty("mysql_db", "mc");
 	}
 	
+	private void setupConsole() {
+		new ConsoleReaderThread(console).start();
+	}
+	
 	private void setupMysqlConnection() {
 		try {
+			log.info("Connecting to the MySQL server...");
 			mysql = new MySQL();
 			mysql.connect(mysqlUser, mysqlPass, mysqlIP, mysqlDB);
 			ConsoleLogManager.addHandler(new MySQLHandler(ConsoleLogManager.driver, this));
+			log.info("Successfully connected to the MySQL server.");
 		} catch (Exception e) {
-			log.severe("Cannot connect to MySQL server!");
-			setupMysqlConnection(); //retry
+			log.severe("Cannot connect to the MySQL server! Retrying...");
+			setupMysqlConnection();
 		}
 	}
 	

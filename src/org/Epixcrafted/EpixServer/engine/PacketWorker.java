@@ -19,7 +19,6 @@ import org.Epixcrafted.EpixServer.protocol.Packet254Ping;
 import org.Epixcrafted.EpixServer.protocol.Packet255Disconnect;
 import org.Epixcrafted.EpixServer.protocol.Packet2Handshake;
 import org.Epixcrafted.EpixServer.protocol.Packet3Chat;
-import org.Epixcrafted.EpixServer.protocol.Packet4Time;
 import org.Epixcrafted.EpixServer.protocol.Packet6Spawn;
 
 public class PacketWorker {
@@ -33,9 +32,6 @@ public class PacketWorker {
 	}
 
 	public void acceptPacket(Packet packet) {
-		if (packet.getPacketId() == 0) {
-			session.setTimeoutTicks(0);
-		} else
 		if (packet.getPacketId() == 2) {
 			onPacket2Handshake((Packet2Handshake) packet);
 		} else
@@ -92,11 +88,11 @@ public class PacketWorker {
 	}
 	
 	private void onPacket3Chat(Packet3Chat packet) {
-		if (((Packet3Chat)packet).message.startsWith("/")) {
-			server.getCommandList().executeCommand(((Packet3Chat)packet).message.substring(1), session.getPlayer());
-			PlayerActionLogger.playerCommand(session, ((Packet3Chat)packet).message);
+		if (packet.message.startsWith("/")) {
+			server.getCommandList().executeCommand(packet.message.substring(1), session.getPlayer());
+			PlayerActionLogger.playerCommand(session, packet.message);
 		} else {
-			PlayerActionLogger.playerChat(session, ((Packet3Chat)packet).message);
+			PlayerActionLogger.playerChat(session, packet.message);
 		}
 	}
 	
@@ -125,7 +121,7 @@ public class PacketWorker {
 	}
 	
 	private void onPacket13PosLook(Packet13PosLook packet) {
-		if (packet.stance - packet.y < 0D || packet.stance - packet.y > 1.65D) {
+		if (packet.stance < 0D || packet.stance > 1.65D) {
 			session.disconnect("Invalid stance");
 			return;
 		}
@@ -168,7 +164,6 @@ public class PacketWorker {
 		session.getPlayer().setOnGround(true);
 		session.send(new Packet6Spawn((int)session.getPlayer().getX(), (int)session.getPlayer().getY(), (int)session.getPlayer().getZ()));
 		session.send(new Packet13PosLook(session.getPlayer().getX(), session.getPlayer().getStance(), session.getPlayer().getY(), session.getPlayer().getZ(), session.getPlayer().getYaw(), session.getPlayer().getPitch(), session.getPlayer().isOnGround()));
-		session.send(new Packet4Time(6000));
 		session.setConnectionState(Connection.PLAYING);
 		PlayerActionLogger.playerLogin(session);
 	}
@@ -190,6 +185,6 @@ public class PacketWorker {
 	}
 	
 	private void onPacket255Disconnect(Packet255Disconnect packet) {
-		session.disconnect("Disconnected");
+		session.disconnect("disconnect.quitting");
 	}
 }

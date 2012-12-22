@@ -2,7 +2,7 @@ package org.Epixcrafted.EpixServer.chat.commands;
 
 import org.Epixcrafted.EpixServer.chat.Colour;
 import org.Epixcrafted.EpixServer.chat.CommandSender;
-import org.Epixcrafted.EpixServer.mc.threads.TickCounter;
+import org.Epixcrafted.EpixServer.threads.TickCounter;
 
 public class CommandTPS implements Command {
 
@@ -19,10 +19,12 @@ public class CommandTPS implements Command {
 	@Override
 	public boolean executeCommand(CommandSender sender, String[] args) {
 		float tps = TickCounter.getTicksPerSecond();
+		float totalTps = TickCounter.getTotalTicksPerSecond();
 		long ticks = TickCounter.getCurrentTick();
 		long uptime = TickCounter.getUptime();
 		String status = tps < 19F ? (tps < 15F ? Colour.DARK_RED + "BAD" : Colour.YELLOW + "NORMAL") : Colour.DARK_GREEN + "GOOD";
 		sender.sendMessage(Colour.PURPLE + "[EpixServer] " + Colour.LIGHT_GREEN + "TPS: " + tps + "/20 " + Colour.CYAN + "[" + status + Colour.CYAN + "]");
+		sender.sendMessage(Colour.PURPLE + "[EpixServer] " + Colour.LIGHT_GREEN + "TPS (whole uptime): " + totalTps + "/20 " + Colour.CYAN + "[" + status + Colour.CYAN + "]");
 		sender.sendMessage(Colour.PURPLE + "[EpixServer] " + Colour.LIGHT_GREEN + "Current tick/Current uptime: " + Colour.CYAN + "[" + Colour.GOLD + ticks + " ticks" + Colour.CYAN + "/" + Colour.GOLD + uptime + " ms" + Colour.CYAN + "]");
 		return true;
 	}

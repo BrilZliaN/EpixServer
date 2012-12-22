@@ -1,7 +1,7 @@
 package org.Epixcrafted.EpixServer.mc.world;
 
-import org.Epixcrafted.EpixServer.mc.block.Block;
 import org.Epixcrafted.EpixServer.mc.entity.Entity;
+import org.Epixcrafted.EpixServer.mc.material.block.Block;
 
 public class Chunk {
 

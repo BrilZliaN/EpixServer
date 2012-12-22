@@ -3,8 +3,8 @@ package org.Epixcrafted.EpixServer.mc.world;
 import java.util.List;
 
 import org.Epixcrafted.EpixServer.mc.Location;
-import org.Epixcrafted.EpixServer.mc.block.Block;
 import org.Epixcrafted.EpixServer.mc.entity.Entity;
+import org.Epixcrafted.EpixServer.mc.material.block.Block;
 
 public class World {
 	

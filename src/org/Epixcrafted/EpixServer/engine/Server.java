@@ -8,7 +8,9 @@ public interface Server {
 	
 	public String getMinecraftVersion();
 	
-	public int getOnlinePlayers();
+	public int getOnlinePlayerCount();
+	
+	public String[] getOnlinePlayers();
 	
 	public int getMaximumPlayers();
 

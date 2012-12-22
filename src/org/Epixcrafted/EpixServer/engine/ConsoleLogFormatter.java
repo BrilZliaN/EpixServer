@@ -1,4 +1,4 @@
-package org.Epixcrafted.EpixServer.engine.log;
+package org.Epixcrafted.EpixServer.engine;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;

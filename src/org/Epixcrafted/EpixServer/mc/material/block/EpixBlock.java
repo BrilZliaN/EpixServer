@@ -1,7 +1,7 @@
-package org.Epixcrafted.EpixServer.mc.block;
+package org.Epixcrafted.EpixServer.mc.material.block;
 
 import org.Epixcrafted.EpixServer.mc.Location;
-import org.Epixcrafted.EpixServer.mc.block.material.Material;
+import org.Epixcrafted.EpixServer.mc.material.Material;
 import org.Epixcrafted.EpixServer.mc.world.Biome;
 import org.Epixcrafted.EpixServer.mc.world.Chunk;
 import org.Epixcrafted.EpixServer.mc.world.World;

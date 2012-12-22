@@ -1,4 +1,4 @@
-package org.Epixcrafted.EpixServer.mc.block.material;
+package org.Epixcrafted.EpixServer.mc.material;
 
 public enum Material {
     AIR(0),

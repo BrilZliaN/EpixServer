@@ -30,10 +30,14 @@ public class Session {
     private Connection state = Connection.CONNECTING;
     private Player player;
     private int keepAliveId;
+    private long startNanos;
+    private int ping;
 
     public Session(EpixServer server, Channel channel) {
         this.server = server;
         this.channel = channel;
+        this.keepAliveId = new Random().nextInt();
+        this.startNanos = System.nanoTime() / 1000000L;
     }
 
     public Connection getConnectionState() {
@@ -65,9 +69,13 @@ public class Session {
     public void update() {
         timeoutCounter++;
         
+        keepAliveId = (int) ((System.nanoTime() / 1000000L) - this.startNanos);
         if (channel.isOpen()) {
             Packet packet;
             while ((packet = packetQueue.poll()) != null) {
+            	if (packet.getPacketId() == 0) {
+            		ping = (ping * 3 + keepAliveId) / 4;
+            	}
                 if (packet.getPacketId() != 2 && packet.getPacketId() != 254) {
                 	if (player != null) worker.acceptPacket(packet);
                 } else {
@@ -83,15 +91,10 @@ public class Session {
                     disconnect("Connection timed out");
                     return;
             	}
-                keepAliveId = new Random().nextInt();
                 send(new Packet0KeepAlive(keepAliveId));
                 timeoutCounter = 0;
             }
         }
-    }
-    
-    public void setTimeoutTicks(int ticks) {
-    	timeoutCounter = ticks;
     }
 
     public void send(Packet packet) {
@@ -110,7 +113,11 @@ public class Session {
         	} else {
         		PlayerActionLogger.playerKick(this);
         	}
-        	channel.write(new Packet255Disconnect(reason)).addListener(ChannelFutureListener.CLOSE);
+        	try {
+				channel.write(Packet.write(new Packet255Disconnect(reason), ChannelBuffers.dynamicBuffer())).addListener(ChannelFutureListener.CLOSE);
+			} catch (NotSupportedOperationException e) {
+				//this should not happen!
+			}
         }
         dispose();
         state = Connection.DISCONNECTED;
@@ -123,11 +130,7 @@ public class Session {
     
     public InetSocketAddress getAddress() {
         SocketAddress addr = channel.getRemoteAddress();
-        try {
-            return (InetSocketAddress) addr;
-        } catch (Exception e) {
-            return null;
-        }
+        return (InetSocketAddress) addr;
     }
 
     public void packetReceived(Packet packet) {
@@ -135,13 +138,17 @@ public class Session {
     }
 
     public void dispose() {
-        if (player != null) {            
-            player = null;
-        }
+        player = null;
     }
-
-    public int getKeepAliveId() {
-        return keepAliveId;
+    
+    public int getPing() {
+    	return ping;
+    }
+    
+    public boolean isConnected() {
+    	boolean isConnected = this.channel.isOpen();
+    	if (!isConnected) this.setConnectionState(Connection.DISCONNECTED);
+    	return isConnected;
     }
     
     public enum Connection {

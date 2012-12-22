@@ -16,7 +16,16 @@ public class CommandList implements Command {
 
 	@Override
 	public boolean executeCommand(CommandSender sender, String[] args) {
-		sender.sendMessage("There are " + sender.getServer().getOnlinePlayers() + "/" + sender.getServer().getMaximumPlayers() + " players online:");
+		String onlinePlayers = "";
+		for (String player : sender.getServer().getOnlinePlayers()) {
+			if (onlinePlayers == "") {
+				onlinePlayers += player;
+			} else {
+				onlinePlayers += " " + player;
+			}
+		}
+		sender.sendMessage("There are " + sender.getServer().getOnlinePlayerCount() + "/" + sender.getServer().getMaximumPlayers() + " players online:");
+		sender.sendMessage(onlinePlayers);
 		return true;
 	}
 

@@ -35,7 +35,7 @@ public class Packet13PosLook extends Packet {
 	public void get(ChannelBuffer buf) {
 		x = buf.readDouble();
 		y = buf.readDouble();
-		stance = buf.readDouble();
+		stance = buf.readDouble() - y;
 		z = buf.readDouble();
 		yaw = buf.readFloat();
 		pitch = buf.readFloat();
@@ -45,7 +45,7 @@ public class Packet13PosLook extends Packet {
 	@Override
 	public ChannelBuffer send(ChannelBuffer buf) {
 		buf.writeDouble(x);
-		buf.writeDouble(stance);
+		buf.writeDouble(y + stance);
 		buf.writeDouble(y);
 		buf.writeDouble(z);
 		buf.writeFloat(yaw);

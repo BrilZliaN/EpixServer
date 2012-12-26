@@ -30,7 +30,6 @@ import org.jboss.netty.channel.group.DefaultChannelGroup;
 import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
 import org.jboss.netty.handler.execution.OrderedMemoryAwareThreadPoolExecutor;
 
-@SuppressWarnings("unused")
 public class EpixServer implements Server {
 	
 	private String ip;

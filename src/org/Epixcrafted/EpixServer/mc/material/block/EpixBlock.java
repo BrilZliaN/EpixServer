@@ -14,6 +14,10 @@ public class EpixBlock implements Block {
 	private int y;
 	private int z;
 
+	public EpixBlock(int id) {
+		this.id = id;
+	}
+	
 	@Override
 	public int getId() {
 		return this.id;

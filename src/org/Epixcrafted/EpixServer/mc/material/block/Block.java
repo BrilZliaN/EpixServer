@@ -55,4 +55,8 @@ public interface Block {
 	public void setBiome(Biome biome);
 	
 	public void setWorld(World world);
+
+	public void setTickRandomly(boolean need);
+	
+	public boolean getTickRandomly();
 }

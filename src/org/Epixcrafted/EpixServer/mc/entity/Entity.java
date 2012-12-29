@@ -11,4 +11,5 @@ public interface Entity {
 	public void setY(double y);
 	public void setZ(double z);
 	public void setHealth(short health);
+	public void onUpdate();
 }

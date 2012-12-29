@@ -1,4 +1,4 @@
-package org.Epixcrafted.EpixServer.mc.block;
+package org.Epixcrafted.EpixServer.mc.material.block;
 
 public class BlockStone extends EpixBlock {
 

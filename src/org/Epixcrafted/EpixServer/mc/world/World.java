@@ -1,5 +1,6 @@
 package org.Epixcrafted.EpixServer.mc.world;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.Epixcrafted.EpixServer.mc.Location;
@@ -7,6 +8,8 @@ import org.Epixcrafted.EpixServer.mc.entity.Entity;
 import org.Epixcrafted.EpixServer.mc.material.block.Block;
 
 public class World {
+	
+	private ArrayList<Entity> entityList;
 	
 	public World() {
 		
@@ -65,7 +68,7 @@ public class World {
 	}
 	
 	public List<Entity> getEntities() {
-		return null;
+		return this.entityList;
 	}
 
 	public void save() {

@@ -13,6 +13,7 @@ public class EpixBlock implements Block {
 	private int x;
 	private int y;
 	private int z;
+	private boolean needsRandomTick;
 
 	public EpixBlock(int id) {
 		this.id = id;
@@ -143,5 +144,19 @@ public class EpixBlock implements Block {
 	public void setWorld(World world) {
 		// TODO
 	}
+	
+	public void setTickRandomly(boolean need)
+    {
+        this.needsRandomTick = need;
+    }
+
+    /**
+     * Returns whether or not this block is of a type that needs random ticking. Called for ref-counting purposes by
+     * ExtendedBlockStorage in order to broadly cull a chunk from the random chunk update list for efficiency's sake.
+     */
+    public boolean getTickRandomly()
+    {
+        return this.needsRandomTick;
+    }
 
 }

@@ -1,72 +1,70 @@
 package org.Epixcrafted.EpixServer.protocol;
 
 import java.util.List;
+import java.util.zip.Deflater;
 
+import org.Epixcrafted.EpixServer.mc.world.Chunk;
 import org.Epixcrafted.EpixServer.misc.NotSupportedOperationException;
 import org.jboss.netty.buffer.ChannelBuffer;
 
 public class Packet56MapChunks extends Packet {
-	private int[] chunkPostX;
+	
+	private int[] chunkPosX;
     private int[] chunkPosZ;
-    public int[] field_73590_a;
-    public int[] field_73588_b;
-
-    /** The compressed chunk data buffer */
+    public int[] chunkExistFlag;
+    public int[] chunkHasAddSectionFlag;
     private byte[] chunkDataBuffer;
-    private byte[][] field_73584_f;
-
-    /** total size of the compressed data */
+    private byte[][] compressedData;
     private int dataLength;
     private static byte[] chunkDataNotCompressed = new byte[0];
 
 	public Packet56MapChunks(List chunks) {
-		int var2 = par1List.size();
-        this.chunkPostX = new int[var2];
-        this.chunkPosZ = new int[var2];
-        this.field_73590_a = new int[var2];
-        this.field_73588_b = new int[var2];
-        this.field_73584_f = new byte[var2][];
-        int var3 = 0;
+		int c_size = chunks.size();
+        this.chunkPosX = new int[c_size];
+        this.chunkPosZ = new int[c_size];
+        this.chunkExistFlag = new int[c_size];
+        this.chunkHasAddSectionFlag = new int[c_size];
+        this.compressedData = new byte[c_size][];
+        int dataLength = 0;
 
-        for (int var4 = 0; var4 < var2; ++var4)
+        for (int numChunk = 0; numChunk < c_size; ++numChunk)
         {
-            Chunk var5 = (Chunk)par1List.get(var4);
-            Packet51MapChunkData var6 = Packet51MapChunk.getMapChunkData(var5, true, 65535);
+            Chunk chunk = (Chunk)chunks.get(numChunk);
+            Packet51MapChunkData chunkData = Packet51MapChunk.getMapChunkData(chunk, true, 65535);
 
-            if (chunkDataNotCompressed.length < var3 + var6.compressedData.length)
+            if (chunkDataNotCompressed.length < dataLength + chunkData.compressedData.length)
             {
-                byte[] var7 = new byte[var3 + var6.compressedData.length];
-                System.arraycopy(chunkDataNotCompressed, 0, var7, 0, chunkDataNotCompressed.length);
-                chunkDataNotCompressed = var7;
+                byte[] DataNotCompressedLength = new byte[dataLength + chunkData.compressedData.length];
+                System.arraycopy(chunkDataNotCompressed, 0, DataNotCompressedLength, 0, chunkDataNotCompressed.length);
+                chunkDataNotCompressed = DataNotCompressedLength;
             }
 
-            System.arraycopy(var6.compressedData, 0, chunkDataNotCompressed, var3, var6.compressedData.length);
-            var3 += var6.compressedData.length;
-            this.chunkPostX[var4] = var5.xPosition;
-            this.chunkPosZ[var4] = var5.zPosition;
-            this.field_73590_a[var4] = var6.chunkExistFlag;
-            this.field_73588_b[var4] = var6.chunkHasAddSectionFlag;
-            this.field_73584_f[var4] = var6.compressedData;
+            System.arraycopy(chunkData.compressedData, 0, chunkDataNotCompressed, dataLength, chunkData.compressedData.length);
+            dataLength += chunkData.compressedData.length;
+            this.chunkPosX[numChunk] = chunk.x;
+            this.chunkPosZ[numChunk] = chunk.z;
+            this.chunkExistFlag[numChunk] = chunkData.chunkExistFlag;
+            this.chunkHasAddSectionFlag[numChunk] = chunkData.chunkHasAddSectionFlag;
+            this.compressedData[numChunk] = chunkData.compressedData;
         }
 
-        Deflater var11 = new Deflater(-1);
+        Deflater deflater = new Deflater(-1);
 
         try
         {
-            var11.setInput(chunkDataNotCompressed, 0, var3);
-            var11.finish();
-            this.chunkDataBuffer = new byte[var3];
-            this.dataLength = var11.deflate(this.chunkDataBuffer);
+        	deflater.setInput(chunkDataNotCompressed, 0, dataLength);
+        	deflater.finish();
+            this.chunkDataBuffer = new byte[dataLength];
+            this.dataLength = deflater.deflate(this.chunkDataBuffer);
         }
         finally
         {
-            var11.end();
+        	deflater.end();
         }
 	}
 	
 	@Override
 	public int getPacketId() {
-		// TODO Auto-generated method stub
 		return 0x38;
 	}
 
@@ -78,8 +76,17 @@ public class Packet56MapChunks extends Packet {
 	@Override
 	public ChannelBuffer send(ChannelBuffer buf)
 			throws NotSupportedOperationException {
-		// TODO Auto-generated method stub
-		return null;
+		buf.writeShort(this.chunkPosX.length);
+        buf.writeInt(this.dataLength);
+        buf.writeBytes(this.chunkDataBuffer);
+        for (int count = 0; count < this.chunkPosX.length; ++count)
+        {
+            buf.writeInt(this.chunkPosX[count]);
+            buf.writeInt(this.chunkPosZ[count]);
+            buf.writeShort((short)(this.chunkExistFlag[count] & 65535));
+            buf.writeShort((short)(this.chunkHasAddSectionFlag[count] & 65535));
+        }
+        return buf;
 	}
 
 }

@@ -1,8 +1,11 @@
 package org.Epixcrafted.EpixServer.protocol;
 
 import java.util.zip.Deflater;
+import java.util.zip.Inflater;
 
 import org.Epixcrafted.EpixServer.mc.world.Chunk;
+import org.Epixcrafted.EpixServer.mc.world.ExtendedBlockStorage;
+import org.Epixcrafted.EpixServer.mc.world.NibbleArray;
 import org.Epixcrafted.EpixServer.misc.NotSupportedOperationException;
 import org.jboss.netty.buffer.ChannelBuffer;
 
@@ -13,229 +16,153 @@ public class Packet51MapChunk extends Packet {
     public int yChMin;
     public int yChMax;
     private byte[] chunkData;
-    /** The compressed chunk data */
     private byte[] compressedChunkData;
     public boolean includeInitialize;
     private int tempLength;
     private static byte[] temp = new byte[196864];
 
-    public Packet51MapChunk(Chunk chunk, boolean par2, int par3)
+    public Packet51MapChunk(Chunk chunk, boolean includeInitialize, int par3)
     {
         this.xCh = chunk.getX();
         this.zCh = chunk.getZ();
-        this.includeInitialize = par2;
-        Packet51MapChunkData var4 = getMapChunkData(ñhunk, par2, par3);
-        Deflater var5 = new Deflater(-1);
-        this.yChMax = var4.chunkHasAddSectionFlag;
-        this.yChMin = var4.chunkExistFlag;
+        this.includeInitialize = includeInitialize;
+        Packet51MapChunkData chunkData = getMapChunkData(chunk, includeInitialize, par3);
+        Deflater deflater = new Deflater(-1);
+        this.yChMax = chunkData.chunkHasAddSectionFlag;
+        this.yChMin = chunkData.chunkExistFlag;
 
         try
         {
-            this.compressedChunkData = var4.compressedData;
-            var5.setInput(var4.compressedData, 0, var4.compressedData.length);
-            var5.finish();
-            this.chunkData = new byte[var4.compressedData.length];
-            this.tempLength = var5.deflate(this.chunkData);
+            this.compressedChunkData = chunkData.compressedData;
+            deflater.setInput(chunkData.compressedData, 0, chunkData.compressedData.length);
+            deflater.finish();
+            this.chunkData = new byte[chunkData.compressedData.length];
+            this.tempLength = deflater.deflate(this.chunkData);
         }
         finally
         {
-            var5.end();
+        	deflater.end();
         }
     }
 
-    /**
-     * Abstract. Reads the raw packet data from the data stream.
-     */
-    public void readPacketData(DataInputStream par1DataInputStream) throws IOException
+
+    public static Packet51MapChunkData getMapChunkData(Chunk chunk, boolean includeInitialize, int par2)
     {
-        this.xCh = par1DataInputStream.readInt();
-        this.zCh = par1DataInputStream.readInt();
-        this.includeInitialize = par1DataInputStream.readBoolean();
-        this.yChMin = par1DataInputStream.readShort();
-        this.yChMax = par1DataInputStream.readShort();
-        this.tempLength = par1DataInputStream.readInt();
-
-        if (temp.length < this.tempLength)
-        {
-            temp = new byte[this.tempLength];
-        }
-
-        par1DataInputStream.readFully(temp, 0, this.tempLength);
-        int var2 = 0;
-        int var3;
-
-        for (var3 = 0; var3 < 16; ++var3)
-        {
-            var2 += this.yChMin >> var3 & 1;
-        }
-
-        var3 = 12288 * var2;
-
-        if (this.includeInitialize)
-        {
-            var3 += 256;
-        }
-
-        this.compressedChunkData = new byte[var3];
-        Inflater var4 = new Inflater();
-        var4.setInput(temp, 0, this.tempLength);
-
-        try
-        {
-            var4.inflate(this.compressedChunkData);
-        }
-        catch (DataFormatException var9)
-        {
-            throw new IOException("Bad compressed data format");
-        }
-        finally
-        {
-            var4.end();
-        }
-    }
-
-    /**
-     * Abstract. Writes the raw packet data to the data stream.
-     */
-    public void writePacketData(DataOutputStream par1DataOutputStream) throws IOException
-    {
-        par1DataOutputStream.writeInt(this.xCh);
-        par1DataOutputStream.writeInt(this.zCh);
-        par1DataOutputStream.writeBoolean(this.includeInitialize);
-        par1DataOutputStream.writeShort((short)(this.yChMin & 65535));
-        par1DataOutputStream.writeShort((short)(this.yChMax & 65535));
-        par1DataOutputStream.writeInt(this.tempLength);
-        par1DataOutputStream.write(this.chunkData, 0, this.tempLength);
-    }
-
-    /**
-     * Passes this Packet on to the NetHandler for processing.
-     */
-    public void processPacket(NetHandler par1NetHandler)
-    {
-        par1NetHandler.handleMapChunk(this);
-    }
-
-    /**
-     * Abstract. Return the size of the packet (not counting the header).
-     */
-    public int getPacketSize()
-    {
-        return 17 + this.tempLength;
-    }
-
-    public static Packet51MapChunkData getMapChunkData(Chunk par0Chunk, boolean par1, int par2)
-    {
-        int var3 = 0;
-        ExtendedBlockStorage[] var4 = par0Chunk.getBlockStorageArray();
+        int compressedDataLength = 0;
+        ExtendedBlockStorage[] blockStorage = chunk.getBlockStorageArray();
         int var5 = 0;
-        Packet51MapChunkData var6 = new Packet51MapChunkData();
-        byte[] var7 = temp;
+        Packet51MapChunkData mapChunkData = new Packet51MapChunkData();
+        byte[] tmp = temp;
 
-        if (par1)
+        if (includeInitialize)
         {
-            par0Chunk.deferRender = true;
+            chunk.deferRender = true;
         }
 
-        int var8;
+        int count;
 
-        for (var8 = 0; var8 < var4.length; ++var8)
+        for (count = 0; count < blockStorage.length; ++count)
         {
-            if (var4[var8] != null && (!par1 || !var4[var8].isEmpty()) && (par2 & 1 << var8) != 0)
+            if (blockStorage[count] != null && (!includeInitialize || !blockStorage[count].isEmpty()) && (par2 & 1 << count) != 0)
             {
-                var6.chunkExistFlag |= 1 << var8;
+                mapChunkData.chunkExistFlag |= 1 << count;
 
-                if (var4[var8].getBlockMSBArray() != null)
+                if (blockStorage[count].getBlockMSBArray() != null)
                 {
-                    var6.chunkHasAddSectionFlag |= 1 << var8;
+                	mapChunkData.chunkHasAddSectionFlag |= 1 << count;
                     ++var5;
                 }
             }
         }
 
-        for (var8 = 0; var8 < var4.length; ++var8)
+        for (count = 0; count < blockStorage.length; ++count)
         {
-            if (var4[var8] != null && (!par1 || !var4[var8].isEmpty()) && (par2 & 1 << var8) != 0)
+            if (blockStorage[count] != null && (!includeInitialize || !blockStorage[count].isEmpty()) && (par2 & 1 << count) != 0)
             {
-                byte[] var9 = var4[var8].getBlockLSBArray();
-                System.arraycopy(var9, 0, var7, var3, var9.length);
-                var3 += var9.length;
+                byte[] blockLSBArray = blockStorage[count].getBlockLSBArray();
+                System.arraycopy(blockLSBArray, 0, tmp, compressedDataLength, blockLSBArray.length);
+                compressedDataLength += blockLSBArray.length;
             }
         }
 
-        NibbleArray var10;
+        NibbleArray metadataArray;
 
-        for (var8 = 0; var8 < var4.length; ++var8)
+        for (count = 0; count < blockStorage.length; ++count)
         {
-            if (var4[var8] != null && (!par1 || !var4[var8].isEmpty()) && (par2 & 1 << var8) != 0)
+            if (blockStorage[count] != null && (!includeInitialize || !blockStorage[count].isEmpty()) && (par2 & 1 << count) != 0)
             {
-                var10 = var4[var8].getMetadataArray();
-                System.arraycopy(var10.data, 0, var7, var3, var10.data.length);
-                var3 += var10.data.length;
+                metadataArray = blockStorage[count].getMetadataArray();
+                System.arraycopy(metadataArray.data, 0, tmp, compressedDataLength, metadataArray.data.length);
+                compressedDataLength += metadataArray.data.length;
             }
         }
 
-        for (var8 = 0; var8 < var4.length; ++var8)
+        for (count = 0; count < blockStorage.length; ++count)
         {
-            if (var4[var8] != null && (!par1 || !var4[var8].isEmpty()) && (par2 & 1 << var8) != 0)
+            if (blockStorage[count] != null && (!includeInitialize || !blockStorage[count].isEmpty()) && (par2 & 1 << count) != 0)
             {
-                var10 = var4[var8].getBlocklightArray();
-                System.arraycopy(var10.data, 0, var7, var3, var10.data.length);
-                var3 += var10.data.length;
+                metadataArray = blockStorage[count].getBlocklightArray();
+                System.arraycopy(metadataArray.data, 0, tmp, compressedDataLength, metadataArray.data.length);
+                compressedDataLength += metadataArray.data.length;
             }
         }
 
-        for (var8 = 0; var8 < var4.length; ++var8)
+        for (count = 0; count < blockStorage.length; ++count)
         {
-            if (var4[var8] != null && (!par1 || !var4[var8].isEmpty()) && (par2 & 1 << var8) != 0)
+            if (blockStorage[count] != null && (!includeInitialize || !blockStorage[count].isEmpty()) && (par2 & 1 << count) != 0)
             {
-                var10 = var4[var8].getSkylightArray();
-                System.arraycopy(var10.data, 0, var7, var3, var10.data.length);
-                var3 += var10.data.length;
+                metadataArray = blockStorage[count].getSkylightArray();
+                System.arraycopy(metadataArray.data, 0, tmp, compressedDataLength, metadataArray.data.length);
+                compressedDataLength += metadataArray.data.length;
             }
         }
 
         if (var5 > 0)
         {
-            for (var8 = 0; var8 < var4.length; ++var8)
+            for (count = 0; count < blockStorage.length; ++count)
             {
-                if (var4[var8] != null && (!par1 || !var4[var8].isEmpty()) && var4[var8].getBlockMSBArray() != null && (par2 & 1 << var8) != 0)
+                if (blockStorage[count] != null && (!includeInitialize || !blockStorage[count].isEmpty()) && blockStorage[count].getBlockMSBArray() != null && (par2 & 1 << count) != 0)
                 {
-                    var10 = var4[var8].getBlockMSBArray();
-                    System.arraycopy(var10.data, 0, var7, var3, var10.data.length);
-                    var3 += var10.data.length;
+                    metadataArray = blockStorage[count].getBlockMSBArray();
+                    System.arraycopy(metadataArray.data, 0, tmp, compressedDataLength, metadataArray.data.length);
+                    compressedDataLength += metadataArray.data.length;
                 }
             }
         }
 
-        if (par1)
+        if (includeInitialize)
         {
-            byte[] var11 = par0Chunk.getBiomeArray();
-            System.arraycopy(var11, 0, var7, var3, var11.length);
-            var3 += var11.length;
+            byte[] biomeArray = chunk.getBiomeArray();
+            System.arraycopy(biomeArray, 0, tmp, compressedDataLength, biomeArray.length);
+            compressedDataLength += biomeArray.length;
         }
 
-        var6.compressedData = new byte[var3];
-        System.arraycopy(var7, 0, var6.compressedData, 0, var3);
-        return var6;
+        mapChunkData.compressedData = new byte[compressedDataLength];
+        System.arraycopy(tmp, 0, mapChunkData.compressedData, 0, compressedDataLength);
+        return mapChunkData;
     }
-	@Override
+	
+    @Override
 	public int getPacketId() {
-		// TODO Auto-generated method stub
 		return 0x33;
 	}
 
 	@Override
 	public void get(ChannelBuffer buf) throws NotSupportedOperationException {
-		// TODO Auto-generated method stub
-
+		throw new NotSupportedOperationException();
 	}
 
 	@Override
 	public ChannelBuffer send(ChannelBuffer buf)
 			throws NotSupportedOperationException {
-		// TODO Auto-generated method stub
-		return null;
+		buf.writeInt(this.xCh);
+		buf.writeInt(this.zCh);
+		buf.writeByte(includeInitialize ? 1 : 0);
+		buf.writeShort((short)(this.yChMin & 65535));
+		buf.writeShort((short)(this.yChMax & 65535));
+		buf.writeInt(this.tempLength);
+		buf.writeBytes(this.chunkData, 0, this.tempLength);
+		return buf;
 	}
 
 }

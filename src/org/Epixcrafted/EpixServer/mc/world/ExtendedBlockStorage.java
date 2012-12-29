@@ -1,6 +1,7 @@
 package org.Epixcrafted.EpixServer.mc.world;
 
-import org.Epixcrafted.EpixServer.mc.block.Block;
+import org.Epixcrafted.EpixServer.mc.material.block.Block;
+import org.Epixcrafted.EpixServer.mc.material.block.BlockList;
 
 public class ExtendedBlockStorage
 {
@@ -10,7 +11,9 @@ public class ExtendedBlockStorage
     private int tickRefCount;
     private byte[] blockLSBArray;
     private NibbleArray blockMSBArray;
-    private NibbleArray blockMetadataArray;private NibbleArray blocklightArray;private NibbleArray skylightArray;
+    private NibbleArray blockMetadataArray;
+    private NibbleArray blocklightArray;
+    private NibbleArray skylightArray;
 
     public ExtendedBlockStorage(int par1)
     {
@@ -22,10 +25,10 @@ public class ExtendedBlockStorage
     }
 
     
-    public int getExtBlockID(int par1, int par2, int par3)
+    public int getExtBlockID(int x, int y, int z)
     {
-        int var4 = this.blockLSBArray[par2 << 8 | par3 << 4 | par1] & 255;
-        return this.blockMSBArray != null ? this.blockMSBArray.get(par1, par2, par3) << 8 | var4 : var4;
+        int var4 = this.blockLSBArray[y << 8 | z << 4 | x] & 255;
+        return this.blockMSBArray != null ? this.blockMSBArray.get(x, y, z) << 8 | var4 : var4;
     }
 
     /**
@@ -35,36 +38,36 @@ public class ExtendedBlockStorage
      */
     public void setExtBlockID(int x, int y, int z, int id)
     {
-        int var5 = this.blockLSBArray[y << 8 | z << 4 | x] & 255;
+        int blockLSB = this.blockLSBArray[y << 8 | z << 4 | x] & 255;
 
         if (this.blockMSBArray != null)
         {
-            var5 |= this.blockMSBArray.get(x, y, z) << 8;
+            blockLSB |= this.blockMSBArray.get(x, y, z) << 8;
         }
 
-        if (var5 == 0 && id != 0)
+        if (blockLSB == 0 && id != 0)
         {
             ++this.blockRefCount;
 
-            if (Block.blocksList[id] != null && Block.blocksList[id].getTickRandomly())
+            if (BlockList.get(id) != null && BlockList.get(id).getTickRandomly())
             {
                 ++this.tickRefCount;
             }
         }
-        else if (var5 != 0 && id == 0)
+        else if (blockLSB != 0 && id == 0)
         {
             --this.blockRefCount;
 
-            if (Block.blocksList[var5] != null && Block.blocksList[var5].getTickRandomly())
+            if (BlockList.get(blockLSB) != null && BlockList.get(blockLSB).getTickRandomly())
             {
                 --this.tickRefCount;
             }
         }
-        else if (Block.blocksList[var5] != null && Block.blocksList[var5].getTickRandomly() && (Block.blocksList[id] == null || !Block.blocksList[id].getTickRandomly()))
+        else if (BlockList.get(blockLSB) != null && BlockList.get(blockLSB).getTickRandomly() && BlockList.get(id) == null || !BlockList.get(id).getTickRandomly())
         {
             --this.tickRefCount;
         }
-        else if ((Block.blocksList[var5] == null || !Block.blocksList[var5].getTickRandomly()) && Block.blocksList[id] != null && Block.blocksList[id].getTickRandomly())
+        else if ((BlockList.get(blockLSB) == null || !BlockList.get(blockLSB).getTickRandomly()) && BlockList.get(id) != null && BlockList.get(id).getTickRandomly())
         {
             ++this.tickRefCount;
         }
@@ -78,11 +81,11 @@ public class ExtendedBlockStorage
                 this.blockMSBArray = new NibbleArray(this.blockLSBArray.length, 4);
             }
 
-            this.blockMSBArray.set(par1, par2, par3, (par4 & 3840) >> 8);
+            this.blockMSBArray.set(x, y, z, (id & 3840) >> 8);
         }
         else if (this.blockMSBArray != null)
         {
-            this.blockMSBArray.set(par1, par2, par3, 0);
+            this.blockMSBArray.set(x, y, z, 0);
         }
     }
 
@@ -172,7 +175,7 @@ public class ExtendedBlockStorage
 
                     if (var4 > 0)
                     {
-                        if (Block.blocksList[var4] == null)
+                        if (BlockList.get(var4) == null)
                         {
                             this.blockLSBArray[var2 << 8 | var3 << 4 | var1] = 0;
 
@@ -185,7 +188,7 @@ public class ExtendedBlockStorage
                         {
                             ++this.blockRefCount;
 
-                            if (Block.blocksList[var4].getTickRandomly())
+                            if (BlockList.get(var4).getTickRandomly())
                             {
                                 ++this.tickRefCount;
                             }

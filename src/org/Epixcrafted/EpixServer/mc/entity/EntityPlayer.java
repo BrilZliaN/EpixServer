@@ -1,5 +1,8 @@
 package org.Epixcrafted.EpixServer.mc.entity;
 
+import java.util.LinkedList;
+import java.util.List;
+
 public class EntityPlayer implements Entity {
 	
 	private int entityId;
@@ -17,6 +20,8 @@ public class EntityPlayer implements Entity {
 	private short food;
 	private float saturation;
 	
+   public final List loadedChunks = new LinkedList();
+        
 	public EntityPlayer(int entityId, String name) {
 		this(entityId, name, 0D, 0D, 0D, 0D, 0F, 0F, true, (short)20, (short)20, 5F);
 	}
@@ -144,5 +149,9 @@ public class EntityPlayer implements Entity {
 	
 	public void setOnGround(boolean onGround) {
 		this.onGround = onGround;
+	}
+	
+	public void onUpdate() {
+		
 	}
 }

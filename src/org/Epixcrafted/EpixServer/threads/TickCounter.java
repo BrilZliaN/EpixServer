@@ -27,7 +27,7 @@ public class TickCounter extends Thread implements Runnable {
 				totalTps = currentTick / ((currTimeMillis - startMillis)/1000F);
 				tps = tps * 0.95F + (1000 / (currTimeMillis-sysMillis)) * 0.05F;
 				currentTick++;
-				new UpdateExecutor(server).start();
+				new UpdateSessionExecutor(server).start();
 				sysMillis = currTimeMillis;
 			}
 			try {

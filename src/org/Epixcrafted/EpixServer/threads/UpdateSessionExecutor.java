@@ -2,14 +2,14 @@ package org.Epixcrafted.EpixServer.threads;
 
 import org.Epixcrafted.EpixServer.EpixServer;
 
-public class UpdateExecutor extends Thread implements Runnable {
+public class UpdateSessionExecutor extends Thread implements Runnable {
 	
 	private static int threadNum = 0;
 	private EpixServer server;
 
-	public UpdateExecutor(EpixServer server) {
+	public UpdateSessionExecutor(EpixServer server) {
 		this.server = server;
-		this.setName("UpdateExecutor-#" + ++threadNum);
+		this.setName("UpdateSessionExecutor-#" + ++threadNum);
 		this.setDaemon(false);
 	}
 	
